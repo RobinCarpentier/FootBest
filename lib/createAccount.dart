@@ -27,9 +27,9 @@ class createAccount extends StatelessWidget {
           children: <Widget>[
             Image.asset(
               'assets/Logo_Footbest.png',
-              width: 100, // Ajustez la largeur selon vos besoins
-              height: 100, // Ajustez la hauteur selon vos besoins
+              height: 75, // Ajustez la hauteur
             ),
+            const SizedBox(height: 50), // Ajouter de l'espace
             Text(
               'Inscription',
               style: Theme.of(context).textTheme.displayMedium,

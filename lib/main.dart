@@ -71,9 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
         backgroundColor: Colors.white,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('FootBest'),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -96,9 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Image.asset(
               'assets/Logo_Footbest.png',
-              width: 100, // Ajustez la largeur selon vos besoins
-              height: 100, // Ajustez la hauteur selon vos besoins
+              height: 75, // Ajustez la hauteur
             ),
+            const SizedBox(height: 50), // Ajouter de l'espace
             Text(
               'Connexion',
               style: Theme.of(context).textTheme.displayMedium,
