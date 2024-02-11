@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1017672470125",
+    "project_id": "footbest-ba003",
+    "storage_bucket": "footbest-ba003.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017672470125:android:607b5431d7940cffe27964",
+        "android_client_info": {
+          "package_name": "com.example.footbest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpQlUPmEXj4gJ5w-jIvHoLsOExJ81fQZ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
