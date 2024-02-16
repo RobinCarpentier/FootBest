@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,16 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAsRlJD99KtsZNhUsnfmRaumHzvKR40vZk',
-    appId: '1:1017672470125:web:4de03e887a8469c5e27964',
-    messagingSenderId: '1017672470125',
-    projectId: 'footbest-ba003',
-    authDomain: 'footbest-ba003.firebaseapp.com',
-    storageBucket: 'footbest-ba003.appspot.com',
-    measurementId: 'G-BJFN0N6WP5',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDpQlUPmEXj4gJ5w-jIvHoLsOExJ81fQZ8',
     appId: '1:1017672470125:android:607b5431d7940cffe27964',
@@ -68,14 +64,5 @@ class DefaultFirebaseOptions {
     projectId: 'footbest-ba003',
     storageBucket: 'footbest-ba003.appspot.com',
     iosBundleId: 'com.example.footbest',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBwPYxtuM2c1j5-Quw5XVIRktn_APkghN4',
-    appId: '1:1017672470125:ios:40c73ffaaf593502e27964',
-    messagingSenderId: '1017672470125',
-    projectId: 'footbest-ba003',
-    storageBucket: 'footbest-ba003.appspot.com',
-    iosBundleId: 'com.example.footbest.RunnerTests',
   );
 }
