@@ -81,9 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _entryField(
     String title,
     TextEditingController controller,
+    {bool isPassword = false}
   ) {
     return TextField(
       controller: controller,
+      obscureText: isPassword, // Masquer le texte si isPassword est vrai
       decoration: InputDecoration(
         labelText: title,
       ),
@@ -142,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.all(16.0),
               child: FractionallySizedBox(
                 widthFactor: 0.7, // Définir la largeur souhaitée
-                child: _entryField('Mot de passe', _controllerPassword),
+                child: _entryField('Mot de passe', _controllerPassword, isPassword: true),
               ),
             ),
             Padding(
