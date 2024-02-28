@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
 }
-
 
 class Settings extends StatelessWidget {
   @override
@@ -29,8 +29,122 @@ class Profile extends StatelessWidget {
 class Matches extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Matchs'),
+    CollectionReference match = FirebaseFirestore.instance.collection('match');
+
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Center(
+        child: Card(
+          elevation: 5,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: match.snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text("Something went wrong");
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // Affichez un indicateur de chargement pendant le chargement
+                }
+
+                if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                  return Text("No matches available");
+                }
+
+                return ListView(
+                  shrinkWrap: true,
+                  children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                    
+                     // Compter le nombre de buts pour l'équipe A
+                    Future<int> countGoalsTeamA() async {
+                      QuerySnapshot querySnapshot = await match.doc(document.id)
+                          .collection('but')
+                          .where('Equipe', isEqualTo: 'A')
+                          .get();
+                      return querySnapshot.docs.length;
+                    }
+                    
+                    // Compter le nombre de buts pour l'équipe B
+                    Future<int> countGoalsTeamB() async {
+                      QuerySnapshot querySnapshot = await match.doc(document.id)
+                          .collection('but')
+                          .where('Equipe', isEqualTo: 'B')
+                          .get();
+                      return querySnapshot.docs.length;
+                    }
+
+                    return FutureBuilder(
+                      future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
+                      builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        if (goalsSnapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        int goalsTeamA = goalsSnapshot.data![0];
+                        int goalsTeamB = goalsSnapshot.data![1];
+
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Logo de l'équipe A
+                                  Image.network(
+                                    'assets/${data['Equipe A']}.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  // Nom de l'équipe A
+                                  Text(
+                                    '${data['Equipe A']}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+                              // Score du match
+                              Text(
+                                '$goalsTeamA - $goalsTeamB',
+                                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+                              // Nom de l'équipe B
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Logo de l'équipe B
+                                  Image.network(
+                                    'assets/${data['Equipe B']}.png',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  // Nom de l'équipe B
+                                  Text(
+                                    '${data['Equipe B']}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                            ]
+                          ),
+                        SizedBox(height: 20), // Espacement à la fin
+                        Divider(), // Ajoute une ligne de séparation entre chaque match
+                      ],
+                    );
+                  });
+                  }).toList(),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -69,14 +183,15 @@ class _MainPageState extends State<MainPage> {
       // Si aucun utilisateur n'est connecté, rediriger vers la page de connexion
       return MaterialApp(
         home: MyApp(), // Redirection vers la page de connexion
+        debugShowCheckedModeBanner: false,
       );
     } else {
       // Si un utilisateur est connecté, afficher la page principale
       return MaterialApp(
         title: 'Main Page',
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            title: Text('Main Page'),
             actions: [
               if (_selectedIndex == 2) // Afficher le bouton de déconnexion uniquement dans l'onglet Profil
                 IconButton(
