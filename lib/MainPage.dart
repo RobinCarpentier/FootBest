@@ -95,7 +95,7 @@ class Matches extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   // Logo de l'équipe A
-                                  Image.network(
+                                  Image.asset(
                                     'assets/${data['Equipe A']}.png',
                                     width: 100,
                                     height: 100,
@@ -119,7 +119,7 @@ class Matches extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   // Logo de l'équipe B
-                                  Image.network(
+                                  Image.asset(
                                     'assets/${data['Equipe B']}.png',
                                     width: 100,
                                     height: 100,
