@@ -117,85 +117,87 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 30), // Décalage horizontal de 20 pixels
-              child: Image.asset(
-                'assets/Logo_Footbest.png',
-                height: 75, // Ajustez la hauteur
-              ),
-            ),
-            const SizedBox(height: 50), // Ajouter de l'espace
-            Text(
-              'Connexion',
-              style: Theme.of(context).textTheme.headline6, // Utilisez headline6 pour un style de texte plus grand
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: FractionallySizedBox(
-                widthFactor: 0.7, // Définir la largeur souhaitée
-                child: _entryField('Adresse Mail', _controllerEmail),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: FractionallySizedBox(
-                widthFactor: 0.7, // Définir la largeur souhaitée
-                child: _entryField('Mot de passe', _controllerPassword, isPassword: true),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FractionallySizedBox(
-                widthFactor: 0.7, // Définir la largeur souhaitée
-                child: _submitButton(),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FractionallySizedBox(
-                widthFactor: 0.7, // Définir la largeur souhaitée
-                child: _erreurMsg(),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.0), // Espace vertical avant la ligne
-              child: SizedBox(
-                child: Divider(
-                  color: Colors.black, // Couleur de la ligne
-                  thickness: 1.0, // Épaisseur de la ligne (ajustez selon vos besoins)
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(right: 30), // Décalage horizontal de 20 pixels
+                child: Image.asset(
+                  'assets/Logo_Footbest.png',
+                  height: 75, // Ajustez la hauteur
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FractionallySizedBox(
-                widthFactor: 0.7, // Définir la largeur souhaitée
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                     context,
-                     MaterialPageRoute(builder: (context) => InscriptionPage()),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("S'inscrire "),
-                      Icon(Icons.arrow_forward),
-                    ],
+              const SizedBox(height: 50), // Ajouter de l'espace
+              Text(
+                'Connexion',
+                style: Theme.of(context).textTheme.headline6, // Utilisez headline6 pour un style de texte plus grand
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.7, // Définir la largeur souhaitée
+                  child: _entryField('Adresse Mail', _controllerEmail),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.7, // Définir la largeur souhaitée
+                  child: _entryField('Mot de passe', _controllerPassword, isPassword: true),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.7, // Définir la largeur souhaitée
+                  child: _submitButton(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.7, // Définir la largeur souhaitée
+                  child: _erreurMsg(),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0), // Espace vertical avant la ligne
+                child: SizedBox(
+                  child: Divider(
+                    color: Colors.black, // Couleur de la ligne
+                    thickness: 1.0, // Épaisseur de la ligne (ajustez selon vos besoins)
                   ),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.7, // Définir la largeur souhaitée
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InscriptionPage()),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("S'inscrire "),
+                        Icon(Icons.arrow_forward),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
