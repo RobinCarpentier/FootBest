@@ -5,12 +5,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
+
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -21,6 +23,7 @@ class Settings extends StatelessWidget {
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -31,6 +34,7 @@ class Profile extends StatelessWidget {
 
 class Matches extends StatelessWidget {
   const Matches({super.key});
+
   @override
   Widget build(BuildContext context) {
     CollectionReference match = FirebaseFirestore.instance.collection('match');
@@ -726,6 +730,7 @@ class Matches extends StatelessWidget {
 
 class Home extends StatelessWidget {
   const Home({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
