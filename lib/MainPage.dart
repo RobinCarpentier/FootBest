@@ -956,8 +956,217 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Accueil'),
+    CollectionReference match = FirebaseFirestore.instance.collection('match');
+    CollectionReference article = FirebaseFirestore.instance.collection('article');
+
+    return Container(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: article.orderBy('Date', descending: true).snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> articleSnapshot) {
+                    if (articleSnapshot.hasError) {
+                      print("Error: ${articleSnapshot.error}");
+                      return const Text("Something went wrong");
+                    }
+
+                    if (articleSnapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator(); // Affichez un indicateur de chargement pendant le chargement
+                    }
+
+                    if (articleSnapshot.hasData && articleSnapshot.data!.docs.isEmpty) {
+                      return const Text("No article available");
+                    }
+
+                    List<QueryDocumentSnapshot> allDocuments = articleSnapshot.data!.docs.toList();
+
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: match.orderBy('Date', descending: true).snapshots(),
+                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> matchSnapshot) {
+                        if (matchSnapshot.hasError) {
+                          print("Error: ${matchSnapshot.error}");
+                          return const Text("Something went wrong");
+                        }
+
+                        if (matchSnapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator(); // Affichez un indicateur de chargement pendant le chargement
+                        }
+
+                        if (matchSnapshot.hasData && matchSnapshot.data!.docs.isEmpty) {
+                          return const Text("No match available");
+                        }
+
+                        allDocuments.addAll(matchSnapshot.data!.docs);
+
+                        allDocuments.sort((a, b) => (b['Date'] as Timestamp).compareTo(a['Date'] as Timestamp));
+
+                        return ListView(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: allDocuments.map((document) {
+                            if (document.reference.parent.id == 'article') {
+                              // Si le document provient de la collection 'article'
+                              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                              List<String> paragraphes = List.from(data['Paragraphes']);
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
+                                child:Card(
+                                color: Colors.white,
+                                elevation: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10), // Ajoute de l'espace entre le contenu et les bords de la Card
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data['Titre'],
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: paragraphes.map((paragraphe) {
+                                          if (paragraphe.endsWith(".jpg")) {
+                                            // Si le paragraphe se termine par ".jpg", afficher une image
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                              child: Image.network(
+                                                paragraphe,
+                                              ),
+                                            );
+                                          } else {
+                                            // Sinon, afficher du texte
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                              child: Text(paragraphe),
+                                            );
+                                          }
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ));
+                            } else if (document.reference.parent.id == 'match') {
+                              // Si le document provient de la collection 'match'
+                              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                              // Compter le nombre de buts pour l'équipe A
+                      Future<int> countGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs.length;
+                      }
+                      
+                      // Compter le nombre de buts pour l'équipe B
+                      Future<int> countGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs.length;
+                      }
+
+                      return FutureBuilder(
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                          if (goalsSnapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
+
+                          int goalsTeamA = goalsSnapshot.data![0];
+                          int goalsTeamB = goalsSnapshot.data![1];
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
+                          child:Card(
+                          color: Colors.white,
+                          elevation: 5,
+                          child: Column(
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Logo de l'équipe A
+                                    Image.asset(
+                                      'assets/${data['Equipe A']}.png',
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    // Nom de l'équipe A
+                                    Text(
+                                      '${data['Equipe A']}',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+                                // Score du match
+                                Text(
+                                  '$goalsTeamA - $goalsTeamB',
+                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+                                // Nom de l'équipe B
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Logo de l'équipe B
+                                    Image.asset(
+                                      'assets/${data['Equipe B']}.png',
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    // Nom de l'équipe B
+                                    Text(
+                                      '${data['Equipe B']}',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                              ]
+                            ),
+                          const SizedBox(height: 20), // Espacement à la fin
+                        ],
+                      )
+                          ]
+                        ),
+                        ));
+                    }
+                    );
+                    } else{
+                      // Handle other content types if any
+                      return Container();
+                    }}).whereType<Widget>().toList());}
+                    );
+                    },
+                )
+              )
+            ]
+          )
+        )
+      )
     );
   }
 }
