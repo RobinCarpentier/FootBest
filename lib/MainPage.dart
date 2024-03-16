@@ -739,6 +739,25 @@ class Home extends StatelessWidget {
   }
 }
 
+Future<String> RecupPseudoUtilisateur() async {
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+  if (userId != null) {
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore.instance
+        .collection('utilisateurs')
+        .doc(userId)
+        .get();
+
+    if (userSnapshot.exists) {
+      return userSnapshot.data()?['pseudo'] ?? 'Pseudo inconnu';
+    } else {
+      return 'Pseudo inconnu';
+    }
+  } else {
+    return 'Pseudo inconnu';
+  }
+}
+
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
@@ -746,7 +765,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // L'utilisateur ne peut pas fermer le dialogue en appuyant à l'extérieur
+      barrierDismissible: false, 
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Déconnexion'),
@@ -761,14 +780,14 @@ class _MainPageState extends State<MainPage> {
             TextButton(
               child: const Text('Annuler'),
               onPressed: () {
-                Navigator.of(context).pop(); // Fermer le dialogue sans déconnecter
+                Navigator.of(context).pop(); 
               },
             ),
             TextButton(
               child: const Text('Se déconnecter'),
               onPressed: () {
-                FirebaseAuth.instance.signOut(); // Déconnexion de l'utilisateur
-                Navigator.of(context).pop(); // Fermer le dialogue
+                FirebaseAuth.instance.signOut(); 
+                Navigator.of(context).pop(); 
                 Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const MyApp()),
@@ -796,30 +815,46 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Vérifier si un utilisateur est connecté
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      // Si aucun utilisateur n'est connecté, rediriger vers la page de connexion
       return const MaterialApp(
-        home: MyApp(), // Redirection vers la page de connexion
+        home: MyApp(),
         debugShowCheckedModeBanner: false,
       );
     } else {
-      // Si un utilisateur est connecté, afficher la page principale
       return MaterialApp(
         title: 'Main Page',
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
             actions: [
-              if (_selectedIndex == 2) // Afficher le bouton de déconnexion uniquement dans l'onglet Profil
-                IconButton(
-                  icon: const Icon(Icons.exit_to_app),
-                  onPressed: () {
-                    _showLogoutConfirmationDialog(context); // Déconnexion de l'utilisateur
-                  },
-                ),
-            ],
+          if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
+            FutureBuilder(
+              future: RecupPseudoUtilisateur(), // Supposons que cette méthode obtient le pseudo de l'utilisateur actuel
+              builder: (context, AsyncSnapshot<String> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SizedBox(); // Afficher un widget vide pendant le chargement
+                } else if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      snapshot.data!,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                } else {
+                  return SizedBox(); // Afficher un widget vide si aucune donnée n'est disponible
+                }
+              },
+            ),
+          if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
+            IconButton(
+              icon: Icon(Icons.exit_to_app),
+              onPressed: () {
+                FirebaseAuth.instance.signOut(); // Déconnexion de l'utilisateur
+              },
+            ),
+        ],
           ),
           body: _pages[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
