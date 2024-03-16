@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:footbest/Inscription.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'auth.dart'; 
-import 'MainPage.dart'; 
-import 'firebase_options.dart'; 
-
+import 'auth.dart';
+import 'MainPage.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-     options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 
@@ -21,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'FootBest',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -50,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controllerPseudo = TextEditingController();
   final TextEditingController _controllerDate = TextEditingController();
 
-
   Future<void> loginWithEmailAndPassword() async {
     try {
       await Auth().connexionWithEmailAndPassword(
@@ -74,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
         email: _controllerEmail.text,
         password: _controllerPassword.text,
         pseudo: _controllerPseudo.text,
-       dateNaissance: DateTime.parse(_controllerDate.text),
+        dateNaissance: DateTime.parse(_controllerDate.text),
       );
       Navigator.pushReplacement(
         context,
@@ -104,7 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: isLogin ? loginWithEmailAndPassword : signUpWithEmailAndPassword,
+      onPressed:
+          isLogin ? loginWithEmailAndPassword : signUpWithEmailAndPassword,
       child: Text(isLogin ? 'Connexion' : 'Inscription'),
     );
   }
@@ -151,7 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: FractionallySizedBox(
                   widthFactor: 0.7,
-                  child: _entryField('Mot de passe', _controllerPassword, isPassword: true),
+                  child: _entryField('Mot de passe', _controllerPassword,
+                      isPassword: true),
                 ),
               ),
               Padding(
@@ -181,24 +179,38 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: FractionallySizedBox(
                   widthFactor: 0.7,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const InscriptionPage()),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Inscription "),
-                        Icon(Icons.arrow_forward),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Pas encore de compte ?",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(
+                          height: 8),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const InscriptionPage()),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Inscription "),
+                            Icon(Icons.arrow_forward),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

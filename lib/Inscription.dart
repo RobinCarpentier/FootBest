@@ -49,9 +49,9 @@ Future<void> _selectDate(BuildContext context) async {
     lastDate: DateTime.now(),
   );
   if (picked != null) {
-    final formattedDate = DateFormat('yyyy-MM-dd').format(picked); // Format de date souhaité
+    final formattedDate = DateFormat('yyyy-MM-dd').format(picked); 
     setState(() {
-      _dateNaissanceController.text = formattedDate; // Mettre à jour le champ de saisie avec la date formatée
+      _dateNaissanceController.text = formattedDate; 
     });
   }
 }
@@ -62,7 +62,7 @@ Widget _datePickerField(BuildContext context) {
     child: FractionallySizedBox(
       widthFactor: 0.7,
       child: InkWell(
-        onTap: () => _selectDate(context), // Ouvrir le sélecteur de date lorsque le champ est cliqué
+        onTap: () => _selectDate(context), 
         child: InputDecorator(
           decoration: const InputDecoration(
             labelText: 'Date de Naissance',
@@ -73,7 +73,7 @@ Widget _datePickerField(BuildContext context) {
               Text(
                 _dateNaissanceController.text,
               ),
-              const Icon(Icons.calendar_today), // Icône du calendrier pour indiquer qu'il s'agit d'un champ de date
+              const Icon(Icons.calendar_today), 
             ],
           ),
         ),
@@ -148,7 +148,7 @@ Widget _datePickerField(BuildContext context) {
                 ),
               ],
             ),
-            const Divider(color: Colors.black), // Barre horizontale séparatrice
+            const Divider(color: Colors.black), 
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Column(

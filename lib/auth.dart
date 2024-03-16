@@ -22,31 +22,47 @@ class Auth{
   required String pseudo,
   required DateTime dateNaissance,
 }) async {
-  // Calcul de l'âge de l'utilisateur
   final age = DateTime.now().year - dateNaissance.year;
 
-  // Vérification si l'utilisateur a au moins 13 ans
   if (age < 13) {
     throw FirebaseAuthException(
       code: 'age_restriction',
       message: 'Vous devez avoir au moins 13 ans pour vous inscrire.',
     );
   }
+   final RegExp regex = RegExp(
+      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$&*]).{8,}$');
+
+  if (!regex.hasMatch(password)) {
+    throw FirebaseAuthException(
+      code: 'faible_password',
+      message:
+          'Le mot de passe doit contenir au moins une majuscule, un nombre, '
+          'un caractère spécial et avoir au moins 8 caractères.',
+    );
+  }
+
+  final pseudoSnapshot = await FirebaseFirestore.instance
+      .collection('utilisateurs')
+      .where('pseudo', isEqualTo: pseudo)
+      .get();
+
+  if (pseudoSnapshot.docs.isNotEmpty) {
+    throw FirebaseAuthException(
+      code: 'pseudo_pris',
+      message: 'Le pseudo est déjà utilisé !',
+    );
+  }
   try {
-    // Création du compte utilisateur avec Firebase Auth
     UserCredential userCredential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     
-    // Récupération de l'identifiant utilisateur
     String userId = userCredential.user!.uid;
 
-    // Stockage des informations supplémentaires dans Firestore
     await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).set({
       'pseudo': pseudo,
       'dateNaissance': dateNaissance,
     });
-    
-    // Enregistrement des informations supplémentaires localement si nécessaire
 
   } on FirebaseAuthException {
     rethrow;
