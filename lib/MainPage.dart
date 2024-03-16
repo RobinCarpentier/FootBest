@@ -10,14 +10,237 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class Settings extends StatelessWidget {
-  const Settings({super.key});
+class Settings extends StatefulWidget {
+  const Settings({Key? key}) : super(key: key);
+
+  @override
+  _SettingsState createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
+  bool isClicked = false;
+  bool isClicked2 = false;
+  bool isClicked3 = false;
+  bool isClicked4 = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () async {
+            setState(() {
+              isClicked = !isClicked; // Inverser l'état du clic
+            });
+            await Future.delayed(const Duration(milliseconds: 100));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ModifPseudo()),
+            );
+            setState(() {
+              isClicked = !isClicked; // Inverser l'état du clic
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 50,
+            decoration: BoxDecoration(
+              color: isClicked ? Colors.grey : Colors.white,
+              border: const Border(
+                top: BorderSide(
+                  color: Colors.grey, // Modifier la couleur en fonction de l'état du clic
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Modifier son pseudo',
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            setState(() {
+              isClicked2 = !isClicked2; // Inverser l'état du clic
+            });
+            await Future.delayed(const Duration(milliseconds: 100));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ModifMail()),
+            );
+            setState(() {
+              isClicked2 = !isClicked2; // Inverser l'état du clic
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 50,
+            decoration: BoxDecoration(
+              color: isClicked2 ? Colors.grey : Colors.white,
+              border: const Border(
+                top: BorderSide(
+                  color: Colors.grey, // Modifier la couleur en fonction de l'état du clic
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Modifier son mail',
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            setState(() {
+              isClicked3 = !isClicked3; // Inverser l'état du clic
+            });
+            await Future.delayed(const Duration(milliseconds: 100));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ModifMdp()),
+            );
+            setState(() {
+              isClicked3 = !isClicked3; // Inverser l'état du clic
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 50,
+            decoration: BoxDecoration(
+              color: isClicked3 ? Colors.grey : Colors.white,
+              border: const Border(
+                top: BorderSide(
+                  color: Colors.grey, // Modifier la couleur en fonction de l'état du clic
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Modifier son mot de passe',
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            setState(() {
+              isClicked4 = !isClicked4; // Inverser l'état du clic
+            });
+            await Future.delayed(const Duration(milliseconds: 100));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SupCompte()),
+            );
+            setState(() {
+              isClicked4 = !isClicked4; // Inverser l'état du clic
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 50,
+            decoration: BoxDecoration(
+              color: isClicked4 ? Colors.grey : Colors.white,
+              border: const Border(
+                top: BorderSide(
+                  color: Colors.grey, // Modifier la couleur en fonction de l'état du clic
+                  width: 1.0,
+                ),
+                bottom: BorderSide(
+                  color: Colors.grey, // Modifier la couleur en fonction de l'état du clic
+                  width: 1.0,
+                ),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Supprimer son compte',
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ModifPseudo extends StatelessWidget {
+  const ModifPseudo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text('Paramètres'),
-    );
+        child: Text(
+          'Modifier son pseudo',
+          style: TextStyle(
+            color: Colors.black, // Couleur du texte en noir
+            fontWeight: FontWeight.normal, // Poids de la police normal
+            decoration: TextDecoration.none,
+            fontSize: 18, // Aucune décoration de texte
+          ),
+        ),
+      );
+  }
+}
+
+class ModifMail extends StatelessWidget {
+  const ModifMail({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+        child: Text(
+          'Modifier son mail',
+          style: TextStyle(
+            color: Colors.black, // Couleur du texte en noir
+            fontWeight: FontWeight.normal, // Poids de la police normal
+            decoration: TextDecoration.none,
+            fontSize: 18, // Aucune décoration de texte
+          ),
+        ),
+      );
+  }
+}
+
+class ModifMdp extends StatelessWidget {
+  const ModifMdp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+        child: Text(
+          'Modifier son mot de passe',
+          style: TextStyle(
+            color: Colors.black, // Couleur du texte en noir
+            fontWeight: FontWeight.normal, // Poids de la police normal
+            decoration: TextDecoration.none,
+            fontSize: 18, // Aucune décoration de texte
+          ),
+        ),
+      );
+  }
+}
+
+class SupCompte extends StatelessWidget {
+  const SupCompte({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+        child: Text(
+          'Supprimer son compte',
+          style: TextStyle(
+            color: Colors.black, // Couleur du texte en noir
+            fontWeight: FontWeight.normal, // Poids de la police normal
+            decoration: TextDecoration.none,
+            fontSize: 18, // Aucune décoration de texte
+          ),
+        ),
+      );
   }
 }
 
@@ -114,7 +337,7 @@ class Matches extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Journée ${data['Journée']} sur 34',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -249,7 +472,7 @@ class Matches extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Journée ${data['Journée']} sur 38',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -384,7 +607,7 @@ class Matches extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Journée ${data['Journée']} sur 38',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -519,7 +742,7 @@ class Matches extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Journée ${data['Journée']} sur 38',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -654,7 +877,7 @@ class Matches extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Journée ${data['Journée']} sur 34',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
