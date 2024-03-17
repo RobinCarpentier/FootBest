@@ -244,13 +244,173 @@ class SupCompte extends StatelessWidget {
   }
 }
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
 
   @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Profil'),
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text('Une erreur est survenue'),
+          );
+        } else {
+           final userData = snapshot.data?.data() as Map<String, dynamic>?;;
+          if (userData == null) {
+            return const Center(
+              child: Text('Aucune donnée disponible'),
+            );
+          }
+          final pseudo = userData['pseudo'] ?? '';
+          final photoUrl = userData['photoUrl'] ?? '';
+          final description = userData['description'] ?? '';
+          final followersCount = userData['followersCount'] ?? 0;
+          final followingCount = userData['followingCount'] ?? 0;
+          final clubsCount = userData['clubsCount'] ?? 0;
+          final leaguesCount = userData['leaguesCount'] ?? 0;
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                    const SizedBox(width: 10),
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoUrl),
+                          radius: 50,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          pseudo,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      children: [
+                        Text(
+                          '$followersCount',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const Text('Abonnés'),
+                      ]
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      children: [
+                        Text(
+                          '$followingCount',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const Text('Abonnements'),
+                      ]
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      children: [
+                        Text(
+                          '$clubsCount',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const Text('Clubs suivis'),
+                      ]
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      children: [
+                        Text(
+                          '$leaguesCount',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const Text('Ligues suivies'),
+                      ]
+                    ),
+                  ],),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      Text(description),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _showEditDescriptionDialog(description);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Couleur de fond du bouton
+                      foregroundColor: Colors.white, // Couleur du texte du bouton
+                    ),
+                    child: const Text(
+                      'Modifier la description',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+  void _showEditDescriptionDialog(String currentDescription) {
+    _descriptionController.text = currentDescription;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Modifier la description'),
+          content: TextField(
+            controller: _descriptionController,
+            decoration: InputDecoration(hintText: 'Nouvelle description'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String newDescription = _descriptionController.text;
+                FirebaseFirestore.instance.collection('utilisateurs').doc(userId).update({
+                  'description': newDescription,
+                }).then((value) {
+                  print('Description mise à jour avec succès');
+                  setState(() {});
+                }).catchError((error) {
+                  print('Erreur lors de la mise à jour de la description: $error');
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Valider'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -1235,7 +1395,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const Home(),
     const Matches(),
-    const Profile(),
+    Profile(),
     const Settings(),
   ];
 
