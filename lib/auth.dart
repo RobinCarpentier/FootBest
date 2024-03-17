@@ -62,6 +62,11 @@ class Auth{
     await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).set({
       'pseudo': pseudo,
       'dateNaissance': dateNaissance,
+      'description': '',
+      'photoUrl': '',
+      'amis': [],
+      'club': [],
+      'ligue': [],
     });
 
   } on FirebaseAuthException {

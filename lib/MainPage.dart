@@ -2,6 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as Path;
+
+class Club {
+  final String name;
+  bool isSelected;
+
+  Club(this.name, {this.isSelected = false});
+}
+
+class Ligue {
+  final String name;
+  bool isSelected;
+
+  Ligue(this.name, {this.isSelected = false});
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -253,6 +271,8 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  final ImagePicker _picker = ImagePicker();
+  File? _image;
   final TextEditingController _descriptionController = TextEditingController();
 
   @override
@@ -288,9 +308,6 @@ class _ProfileState extends State<Profile> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                    const SizedBox(width: 10),
                     Column(
                       children: [
                         CircleAvatar(
@@ -304,7 +321,10 @@ class _ProfileState extends State<Profile> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     Column(
                       children: [
                         Text(
@@ -352,7 +372,7 @@ class _ProfileState extends State<Profile> {
                       Text(description),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {
                       _showEditDescriptionDialog(description);
@@ -365,6 +385,128 @@ class _ProfileState extends State<Profile> {
                       'Modifier la description',
                       style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _pickImage();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Couleur de fond du bouton
+                      foregroundColor: Colors.white, // Couleur du texte du bouton
+                    ),
+                    child: const Text(
+                      'Changer de photo',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Couleur de fond du bouton
+                      foregroundColor: Colors.white, // Couleur du texte du bouton
+                    ),
+                    child: const Text(
+                      'Ajouter un ami',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final clubs = await fetchClubsFromFirebase();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return AlertDialog(
+                                title: Text('Ajouter un club'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    children: clubs.map((club) {
+                                      return Container(width: 500, child: CheckboxListTile(
+                                        title: Row(
+                                          children: [
+                                            Image.asset('assets/${club.name}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                                            SizedBox(width: 10), // Espacement entre l'icône et le titre
+                                            Text(club.name,style: TextStyle(fontSize: 15)),
+                                          ],
+                                        ),
+                                        value: club.isSelected,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            club.isSelected = value ?? false;
+                                          });
+                                        },// Icône affichée à droite du titre
+                                      ),);
+                                    }).toList(),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Couleur de fond du bouton
+                      foregroundColor: Colors.white, // Couleur du texte du bouton
+                    ),
+                    child: const Text(
+                      'Ajouter un club',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final ligues = await fetchLiguesFromFirebase();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return AlertDialog(
+                                title: Text('Ajouter un championnat'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    children: ligues.map((ligue) {
+                                      return Container(width: 500, child: CheckboxListTile(
+                                        title: Row(
+                                          children: [
+                                            Image.asset('assets/${ligue.name}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                                            SizedBox(width: 10), // Espacement entre l'icône et le titre
+                                            Text(ligue.name,style: TextStyle(fontSize: 15)),
+                                          ],
+                                        ),
+                                        value: ligue.isSelected,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            ligue.isSelected = value ?? false;
+                                          });
+                                        },
+                                      ),);
+                                    }).toList(),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Couleur de fond du bouton
+                      foregroundColor: Colors.white, // Couleur du texte du bouton
+                    ),
+                    child: const Text(
+                      'Ajouter un championnat',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -412,6 +554,94 @@ class _ProfileState extends State<Profile> {
         );
       },
     );
+  }
+  void _pickImage() async {
+    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _uploadImageToFirebaseStorage();
+      Navigator.of(context).pop();
+    }
+  }
+  void _uploadImageToFirebaseStorage() async {
+    if (_image == null) return;
+
+    try {
+      String fileName = Path.basename(_image!.path);
+      Reference firebaseStorageRef = FirebaseStorage.instance.ref().child('profile_images/$fileName');
+      UploadTask uploadTask = firebaseStorageRef.putFile(_image!);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      // Mettre à jour l'URL de l'image dans Firestore
+      FirebaseFirestore.instance.collection('utilisateurs').doc(userId).update({
+        'photoUrl': imageUrl,
+      }).then((value) {
+        print('Photo de profil mise à jour avec succès');
+      }).catchError((error) {
+        print('Erreur lors de la mise à jour de la photo de profil: $error');
+      });
+    } catch (e) {
+      print('Erreur lors de la mise à jour de la photo de profil: $e');
+    }
+  }
+  
+  Future<List<Club>> fetchClubsFromFirebase() async {
+    List<Club> clubs = [];
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Championnat').get();
+      querySnapshot.docs.forEach((doc) {
+        if(doc.id == "Ligue 1"){
+          for(int i = 1;i<=18;i++){
+            clubs.add(Club(doc["Equipe $i"]));
+          }
+        }
+        if(doc.id == "La Liga"){
+          for(int i = 1;i<=20;i++){
+            clubs.add(Club(doc["Equipe $i"]));
+          }
+        }
+        if(doc.id == "Premier League"){
+          for(int i = 1;i<=20;i++){
+            clubs.add(Club(doc["Equipe $i"]));
+          }
+        }
+        if(doc.id == "Serie A"){
+          for(int i = 1;i<=20;i++){
+            clubs.add(Club(doc["Equipe $i"]));
+          }
+        }
+        if(doc.id == "Bundesliga"){
+          for(int i = 1;i<=18;i++){
+            clubs.add(Club(doc["Equipe $i"]));
+          }
+        }
+      });
+    } catch (e) {
+      print('Error fetching clubs: $e');
+    }
+    return clubs;
+  }
+
+  Future<List<Ligue>> fetchLiguesFromFirebase() async {
+    List<Ligue> ligues = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+      querySnapshot.docs.forEach((doc) {
+        ligues.add(Ligue(doc.id));
+      });
+      QuerySnapshot querySnapshot2 = await FirebaseFirestore.instance.collection('Compétitions Européennes ').get();
+      querySnapshot2.docs.forEach((doc) {
+        ligues.add(Ligue(doc.id));
+      });
+    } catch (e) {
+      print('Error fetching clubs: $e');
+    }
+    return ligues;
   }
 }
 
@@ -1419,35 +1649,45 @@ class _MainPageState extends State<MainPage> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            actions: [
-          if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
-            FutureBuilder(
-              future: RecupPseudoUtilisateur(), // Supposons que cette méthode obtient le pseudo de l'utilisateur actuel
-              builder: (context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return SizedBox(); // Afficher un widget vide pendant le chargement
-                } else if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      snapshot.data!,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                } else {
-                  return SizedBox(); // Afficher un widget vide si aucune donnée n'est disponible
-                }
-              },
-            ),
-          if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
-            IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed: () {
-                FirebaseAuth.instance.signOut(); // Déconnexion de l'utilisateur
-              },
-            ),
-        ],
+  actions: [
+    Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/Logo_Footbest.png',
           ),
+        ],
+      ),
+    ),
+    if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
+      FutureBuilder(
+        future: RecupPseudoUtilisateur(), // Supposons que cette méthode obtient le pseudo de l'utilisateur actuel
+        builder: (context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(); // Afficher un widget vide pendant le chargement
+          } else if (snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                snapshot.data!,
+                style: const TextStyle(fontSize: 16),
+              ),
+            );
+          } else {
+            return const SizedBox(); // Afficher un widget vide si aucune donnée n'est disponible
+          }
+        },
+      ),
+    if (_selectedIndex == 2) // Afficher dans l'onglet Profil uniquement
+      IconButton(
+        icon: const Icon(Icons.exit_to_app),
+        onPressed: () {
+          FirebaseAuth.instance.signOut(); // Déconnexion de l'utilisateur
+        },
+      ),
+  ],
+),
           body: _pages[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             items: const [
