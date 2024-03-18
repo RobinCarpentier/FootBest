@@ -11,14 +11,14 @@ class Club {
   final String name;
   bool isSelected;
 
-  Club(this.name, {this.isSelected = false});
+  Club(this.name, this.isSelected);
 }
 
 class Ligue {
   final String name;
   bool isSelected;
 
-  Ligue(this.name, {this.isSelected = false});
+  Ligue(this.name, this.isSelected);
 }
 
 class MainPage extends StatefulWidget {
@@ -296,18 +296,20 @@ class _ProfileState extends State<Profile> {
             );
           }
           final pseudo = userData['pseudo'] ?? '';
-          final photoUrl = userData['photoUrl'] ?? '';
+          String photoUrl = userData['photoUrl'] ?? '';
+          if(photoUrl == ''){
+            photoUrl = 'assets/Inconnu.png';
+          }
           final description = userData['description'] ?? '';
-          final followersCount = userData['followersCount'] ?? 0;
-          final followingCount = userData['followingCount'] ?? 0;
-          final clubsCount = userData['clubsCount'] ?? 0;
-          final leaguesCount = userData['leaguesCount'] ?? 0;
+          final followingCount = (userData['amis'] as List<dynamic>?)?.length ?? 0;
+          final clubsCount = (userData['club'] as List<dynamic>?)?.length ?? 0;
+          final leaguesCount = (userData['ligue'] as List<dynamic>?)?.length ?? 0;
           return Scaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 100),
                     Column(
                       children: [
                         CircleAvatar(
@@ -317,7 +319,7 @@ class _ProfileState extends State<Profile> {
                         const SizedBox(height: 5),
                         Text(
                           pseudo,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -327,9 +329,19 @@ class _ProfileState extends State<Profile> {
                     children: [
                     Column(
                       children: [
-                        Text(
-                          '$followersCount',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        FutureBuilder<int>(
+                          future: getFollowersCount(pseudo),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else {
+                              final followersCount = snapshot.data ?? 0;
+                              return Text(
+                                '$followersCount',
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              );
+                            }
+                          },
                         ),
                         const Text('Abonnés'),
                       ]
@@ -410,14 +422,15 @@ class _ProfileState extends State<Profile> {
                       foregroundColor: Colors.white, // Couleur du texte du bouton
                     ),
                     child: const Text(
-                      'Ajouter un ami',
+                      'Ajouter un utilisateur',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      final clubs = await fetchClubsFromFirebase();
+                      final selectedClubs = <Club>[];
+                      final clubs = await fetchClubsFromFirebase(selectedClubs);
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -440,12 +453,32 @@ class _ProfileState extends State<Profile> {
                                         onChanged: (bool? value) {
                                           setState(() {
                                             club.isSelected = value ?? false;
+                                            if (value ?? false) {
+                                              selectedClubs.add(club);
+                                            } else {
+                                              selectedClubs.remove(club);
+                                            }
                                           });
                                         },// Icône affichée à droite du titre
                                       ),);
                                     }).toList(),
                                   ),
                                 ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Annuler'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await updateUserClubsInFirebase(selectedClubs);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Valider'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -464,7 +497,8 @@ class _ProfileState extends State<Profile> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      final ligues = await fetchLiguesFromFirebase();
+                      final selectedLigues = <Ligue>[];
+                      final ligues = await fetchLiguesFromFirebase(selectedLigues);
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -487,12 +521,32 @@ class _ProfileState extends State<Profile> {
                                         onChanged: (bool? value) {
                                           setState(() {
                                             ligue.isSelected = value ?? false;
+                                            if (value ?? false) {
+                                              selectedLigues.add(ligue);
+                                            } else {
+                                              selectedLigues.remove(ligue);
+                                            }
                                           });
                                         },
                                       ),);
                                     }).toList(),
                                   ),
                                 ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Annuler'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await updateUserLiguesInFirebase(selectedLigues);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Valider'),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -516,6 +570,20 @@ class _ProfileState extends State<Profile> {
       },
     );
   }
+
+  Future<int> getFollowersCount(String userPseudo) async {
+    int compteur = 0;
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] != userPseudo){
+        if(doc["amis"].contains(userPseudo)){
+          compteur++;
+        }
+      }
+    });
+    return compteur;
+  }
+
   void _showEditDescriptionDialog(String currentDescription) {
     _descriptionController.text = currentDescription;
 
@@ -589,35 +657,66 @@ class _ProfileState extends State<Profile> {
     }
   }
   
-  Future<List<Club>> fetchClubsFromFirebase() async {
+  Future<List<Club>> fetchClubsFromFirebase(List<Club> selectedClubs) async {
     List<Club> clubs = [];
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('Championnat').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+      final userDocument = await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get();
+      final List<dynamic>? userClubs = userDocument.data()?['club'];
       querySnapshot.docs.forEach((doc) {
         if(doc.id == "Ligue 1"){
           for(int i = 1;i<=18;i++){
-            clubs.add(Club(doc["Equipe $i"]));
+            if(userClubs != null && userClubs.contains(doc["Equipe $i"])){
+              clubs.add(Club(doc["Equipe $i"],true));
+              selectedClubs.add(Club(doc["Equipe $i"],true));
+            }
+            else{
+              clubs.add(Club(doc["Equipe $i"],false));
+            }
           }
         }
         if(doc.id == "La Liga"){
           for(int i = 1;i<=20;i++){
-            clubs.add(Club(doc["Equipe $i"]));
+            if(userClubs != null && userClubs.contains(doc["Equipe $i"])){
+              clubs.add(Club(doc["Equipe $i"],true));
+              selectedClubs.add(Club(doc["Equipe $i"],true));
+            }
+            else{
+              clubs.add(Club(doc["Equipe $i"],false));
+            }
           }
         }
         if(doc.id == "Premier League"){
           for(int i = 1;i<=20;i++){
-            clubs.add(Club(doc["Equipe $i"]));
+            if(userClubs != null && userClubs.contains(doc["Equipe $i"])){
+              clubs.add(Club(doc["Equipe $i"],true));
+              selectedClubs.add(Club(doc["Equipe $i"],true));
+            }
+            else{
+              clubs.add(Club(doc["Equipe $i"],false));
+            }
           }
         }
         if(doc.id == "Serie A"){
           for(int i = 1;i<=20;i++){
-            clubs.add(Club(doc["Equipe $i"]));
+            if(userClubs != null && userClubs.contains(doc["Equipe $i"])){
+              clubs.add(Club(doc["Equipe $i"],true));
+              selectedClubs.add(Club(doc["Equipe $i"],true));
+            }
+            else{
+              clubs.add(Club(doc["Equipe $i"],false));
+            }
           }
         }
         if(doc.id == "Bundesliga"){
           for(int i = 1;i<=18;i++){
-            clubs.add(Club(doc["Equipe $i"]));
+            if(userClubs != null && userClubs.contains(doc["Equipe $i"])){
+              clubs.add(Club(doc["Equipe $i"],true));
+              selectedClubs.add(Club(doc["Equipe $i"],true));
+            }
+            else{
+              clubs.add(Club(doc["Equipe $i"],false));
+            }
           }
         }
       });
@@ -627,21 +726,58 @@ class _ProfileState extends State<Profile> {
     return clubs;
   }
 
-  Future<List<Ligue>> fetchLiguesFromFirebase() async {
+  Future<List<Ligue>> fetchLiguesFromFirebase(List<Ligue> selectedLigues) async {
     List<Ligue> ligues = [];
     try {
+      final userDocument = await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get();
+      final List<dynamic>? userLigues = userDocument.data()?['ligue'];
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
       querySnapshot.docs.forEach((doc) {
-        ligues.add(Ligue(doc.id));
+        if(userLigues != null && userLigues.contains(doc.id)){
+          ligues.add(Ligue(doc.id,true));
+          selectedLigues.add(Ligue(doc.id,true));
+        }
+        else{
+          ligues.add(Ligue(doc.id,false));
+        }
       });
       QuerySnapshot querySnapshot2 = await FirebaseFirestore.instance.collection('Compétitions Européennes ').get();
       querySnapshot2.docs.forEach((doc) {
-        ligues.add(Ligue(doc.id));
+        if(userLigues != null && userLigues.contains(doc.id)){
+          ligues.add(Ligue(doc.id,true));
+          selectedLigues.add(Ligue(doc.id,true));
+        }
+        else{
+          ligues.add(Ligue(doc.id,false));
+        }
       });
     } catch (e) {
       print('Error fetching clubs: $e');
     }
     return ligues;
+  }
+
+  Future<void> updateUserClubsInFirebase(List<Club> selectedClubs) async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('utilisateurs').doc(userId);
+      List<String> selectedClubNames = selectedClubs.map((club) => club.name).toList();
+      await userRef.update({'club': selectedClubNames});
+      print('Clubs mis à jour avec succès dans Firebase !');
+    } catch (error) {
+      print('Erreur lors de la mise à jour des clubs dans Firebase: $error');
+    }
+  }
+
+  Future<void> updateUserLiguesInFirebase(List<Ligue> selectedLigues) async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('utilisateurs').doc(userId);
+      List<String> selectedLigueNames = selectedLigues.map((ligue) => ligue.name).toList();
+      await userRef.update({'ligue': selectedLigueNames});
+      print('Ligues mis à jour avec succès dans Firebase !');
+    } catch (error) {
+      print('Erreur lors de la mise à jour des ligues dans Firebase: $error');
+      // Gérer l'erreur selon vos besoins
+    }
   }
 }
 
