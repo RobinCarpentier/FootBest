@@ -309,7 +309,7 @@ class _ProfileState extends State<Profile> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 10),
                     Column(
                       children: [
                         CircleAvatar(
