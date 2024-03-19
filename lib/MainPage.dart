@@ -274,6 +274,9 @@ class _ProfileState extends State<Profile> {
   final ImagePicker _picker = ImagePicker();
   File? _image;
   final TextEditingController _descriptionController = TextEditingController();
+  int followingCount = 0;
+  int clubsCount = 0;
+  int leaguesCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -301,9 +304,9 @@ class _ProfileState extends State<Profile> {
             photoUrl = 'assets/Inconnu.png';
           }
           final description = userData['description'] ?? '';
-          final followingCount = (userData['amis'] as List<dynamic>?)?.length ?? 0;
-          final clubsCount = (userData['club'] as List<dynamic>?)?.length ?? 0;
-          final leaguesCount = (userData['ligue'] as List<dynamic>?)?.length ?? 0;
+          int followingCount = (userData['amis'] as List<dynamic>?)?.length ?? 0;
+          int clubsCount = (userData['club'] as List<dynamic>?)?.length ?? 0;
+          int leaguesCount = (userData['ligue'] as List<dynamic>?)?.length ?? 0;
           return Scaffold(
             body: Center(
               child: Column(
@@ -327,54 +330,74 @@ class _ProfileState extends State<Profile> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                    Column(
-                      children: [
-                        FutureBuilder<int>(
-                          future: getFollowersCount(pseudo),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else {
-                              final followersCount = snapshot.data ?? 0;
-                              return Text(
-                                '$followersCount',
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                              );
-                            }
-                          },
-                        ),
-                        const Text('Abonnés'),
-                      ]
+                    InkWell(
+                      onTap: () {
+                        
+                      },
+                      child: Column(
+                        children: [
+                          FutureBuilder<int>(
+                            future: getFollowersCount(pseudo),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else {
+                                final followersCount = snapshot.data ?? 0;
+                                return Text(
+                                  '$followersCount',
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                );
+                              }
+                            },
+                          ),
+                          const Text('Abonnés'),
+                        ]
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      children: [
-                        Text(
-                          '$followingCount',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const Text('Abonnements'),
-                      ]
+                    InkWell(
+                      onTap: () {
+                        
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            '$followingCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Abonnements'),
+                        ]
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      children: [
-                        Text(
-                          '$clubsCount',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const Text('Clubs suivis'),
-                      ]
+                    InkWell(
+                      onTap: () {
+                        
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            '$clubsCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Clubs suivis'),
+                        ]
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      children: [
-                        Text(
-                          '$leaguesCount',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const Text('Ligues suivies'),
-                      ]
+                    InkWell(
+                        onTap: () {
+                          
+                        },
+                        child: Column(
+                        children: [
+                          Text(
+                            '$leaguesCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Ligues suivies'),
+                        ]
+                      ),
                     ),
                   ],),
                   const SizedBox(height: 15),
@@ -415,7 +438,74 @@ class _ProfileState extends State<Profile> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      
+                      showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  TextEditingController _searchController =
+                      TextEditingController();
+                  List<DocumentSnapshot> _searchResults = [];
+
+                  Future<List<DocumentSnapshot>> searchUsers(String searchTerm) async {
+                    var querySnapshot = await FirebaseFirestore.instance
+                      .collection('utilisateurs')
+                      .where('pseudo', isEqualTo: searchTerm)
+                      .where('pseudo', isNotEqualTo: pseudo)
+                      .get();
+                    return querySnapshot.docs;
+                  }
+
+                  return AlertDialog(
+  title: Text('Ajouter un utilisateur'),
+  content: StatefulBuilder(
+    builder: (BuildContext context, StateSetter setState) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              labelText: 'Rechercher un utilisateur',
+            ),
+            onChanged: (value) async {
+              List<DocumentSnapshot> results = await searchUsers(value);
+              setState(() {
+                _searchResults = results;
+              });
+            },
+          ),
+          SizedBox(height: 20),
+          _searchResults.isEmpty
+              ? Center(
+                  child: Text('Aucun résultat trouvé'),
+                )
+              : SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.5, // Ajustez la hauteur selon vos besoins
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: _searchResults.map((user) {
+                        return ListTile(
+                          title: Text(user['pseudo']),
+                          onTap: () {
+                            Navigator.pop(context); // Fermer la boîte de dialogue de recherche
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserProfilePage(user),
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+        ],
+      );
+    },
+  ),
+);
+                },
+              );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // Couleur de fond du bouton
@@ -456,7 +546,7 @@ class _ProfileState extends State<Profile> {
                                             if (value ?? false) {
                                               selectedClubs.add(club);
                                             } else {
-                                              selectedClubs.remove(club);
+                                              selectedClubs.removeWhere((c) => c.name == club.name);
                                             }
                                           });
                                         },// Icône affichée à droite du titre
@@ -475,6 +565,7 @@ class _ProfileState extends State<Profile> {
                                     onPressed: () async {
                                       await updateUserClubsInFirebase(selectedClubs);
                                       Navigator.of(context).pop();
+                                      refreshUserData();
                                     },
                                     child: Text('Valider'),
                                   ),
@@ -524,7 +615,7 @@ class _ProfileState extends State<Profile> {
                                             if (value ?? false) {
                                               selectedLigues.add(ligue);
                                             } else {
-                                              selectedLigues.remove(ligue);
+                                              selectedLigues.removeWhere((l) => l.name == ligue.name);
                                             }
                                           });
                                         },
@@ -543,6 +634,7 @@ class _ProfileState extends State<Profile> {
                                     onPressed: () async {
                                       await updateUserLiguesInFirebase(selectedLigues);
                                       Navigator.of(context).pop();
+                                      refreshUserData();
                                     },
                                     child: Text('Valider'),
                                   ),
@@ -582,6 +674,14 @@ class _ProfileState extends State<Profile> {
       }
     });
     return compteur;
+  }
+
+  Future<void> refreshUserData() async {
+    final userData = await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get();
+    setState(() {
+      clubsCount = (userData['club'] as List<dynamic>?)?.length ?? 0;
+      leaguesCount = (userData['ligue'] as List<dynamic>?)?.length ?? 0;
+    });
   }
 
   void _showEditDescriptionDialog(String currentDescription) {
@@ -778,6 +878,29 @@ class _ProfileState extends State<Profile> {
       print('Erreur lors de la mise à jour des ligues dans Firebase: $error');
       // Gérer l'erreur selon vos besoins
     }
+  }
+}
+
+class UserProfilePage extends StatelessWidget {
+  final DocumentSnapshot user;
+
+  UserProfilePage(this.user);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profil de ${user['pseudo']}'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            // Add subscription logic here
+          },
+          child: Text('S\'abonner'),
+        ),
+      ),
+    );
   }
 }
 
