@@ -7,6 +7,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as Path;
 
+class Amis {
+  final String name;
+  final String url;
+
+  Amis(this.name, this.url);
+}
+
 class Club {
   final String name;
   bool isSelected;
@@ -332,7 +339,7 @@ class _ProfileState extends State<Profile> {
                     children: [
                     InkWell(
                       onTap: () {
-                        
+                        showAbonneList(context, pseudo);
                       },
                       child: Column(
                         children: [
@@ -357,7 +364,7 @@ class _ProfileState extends State<Profile> {
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () {
-                        
+                        showAbonnementList(context);
                       },
                       child: Column(
                         children: [
@@ -372,7 +379,7 @@ class _ProfileState extends State<Profile> {
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () {
-                        
+                        showClubList(context);
                       },
                       child: Column(
                         children: [
@@ -387,7 +394,7 @@ class _ProfileState extends State<Profile> {
                     const SizedBox(width: 10),
                     InkWell(
                         onTap: () {
-                          
+                          showLigueList(context);
                         },
                         child: Column(
                         children: [
@@ -479,20 +486,39 @@ class _ProfileState extends State<Profile> {
                   child: Text('Aucun résultat trouvé'),
                 )
               : SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5, // Ajustez la hauteur selon vos besoins
                   child: SingleChildScrollView(
                     child: Column(
                       children: _searchResults.map((user) {
+                        String photoUserUrl = user['photoUrl'] ?? '';
+                        if(photoUserUrl == ''){
+                          photoUserUrl = 'assets/Inconnu.png';
+                        }
                         return ListTile(
-                          title: Text(user['pseudo']),
-                          onTap: () {
+                          title: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(photoUserUrl),
+                                    radius: 15,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(user['pseudo'],style: const TextStyle(fontSize: 15))
+                                ],
+                              ),
+                            ],
+                          ),
+                          onTap: () async {
                             Navigator.pop(context); // Fermer la boîte de dialogue de recherche
-                            Navigator.push(
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => UserProfilePage(user),
+                                builder: (context) => UserProfilePage(user['pseudo'],userId),
                               ),
                             );
+                            if (result != null && result is bool && result) {
+                              setState(() {});
+                            }
                           },
                         );
                       }).toList(),
@@ -852,7 +878,7 @@ class _ProfileState extends State<Profile> {
         }
       });
     } catch (e) {
-      print('Error fetching clubs: $e');
+      print('Error fetching ligues: $e');
     }
     return ligues;
   }
@@ -876,31 +902,714 @@ class _ProfileState extends State<Profile> {
       print('Ligues mis à jour avec succès dans Firebase !');
     } catch (error) {
       print('Erreur lors de la mise à jour des ligues dans Firebase: $error');
-      // Gérer l'erreur selon vos besoins
     }
+  }
+
+  void showAbonneList(BuildContext context, String pseudo) async {
+    List<Amis> subscriptions = await fetchAbonneFromFirebase(pseudo);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos abonnés'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: subscriptions.map((subscription) {
+                String urlAbo = subscription.url;
+                if(urlAbo == ""){
+                  urlAbo = "assets/Inconnu.png";
+                }
+                return ListTile(
+                  title: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(urlAbo),
+                            radius: 15,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(subscription.name,style: const TextStyle(fontSize: 15))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<List<Amis>> fetchAbonneFromFirebase(String userPseudo) async {
+    List<Amis> abonne = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] != userPseudo){
+        if(doc["amis"].contains(userPseudo)){
+          abonne.add(Amis(doc["pseudo"],doc["photoUrl"]));
+        }
+      }
+    });
+    return abonne;
+  }
+
+  void showAbonnementList(BuildContext context) async {
+    List<Amis> subscriptions = await fetchAbonnementFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos abonnements'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: subscriptions.map((subscription) {
+                String urlAbo = subscription.url;
+                if(urlAbo == ""){
+                  urlAbo = "assets/Inconnu.png";
+                }
+                return ListTile(
+                  title: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(urlAbo),
+                            radius: 15,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(subscription.name,style: const TextStyle(fontSize: 15))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+   Future<List<Amis>> fetchAbonnementFromFirebase() async {
+    CollectionReference usersCollection = FirebaseFirestore.instance.collection('utilisateurs');
+    DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
+
+    if (userSnapshot.exists && userSnapshot.data() != null) {
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+      if (userData.containsKey('amis')) {
+        List<dynamic> subscriptions = userData['amis'];
+        List<Amis> abonnements = [];
+        for (var subscription in subscriptions) {
+          String pseudo = subscription.toString();
+          String photoUrl = await recupUrl(pseudo);
+          abonnements.add(Amis(pseudo, photoUrl));
+        }
+        return abonnements;
+      }
+    }
+    return [];
+  }
+  Future<String> recupUrl(String userPseudo) async{
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    String photoUrl = "";
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] == userPseudo){
+        photoUrl = doc["photoUrl"];
+      }
+    });
+    return photoUrl;
+  }
+
+  void showClubList(BuildContext context) async {
+    List<String> clubs = await fetchClubFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos clubs suivis'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: clubs.map((club) {
+                return Container(
+                  child: Column(
+                    children: [
+                      Row(
+                      children: [
+                        Image.asset('assets/${club}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                        SizedBox(width: 10), // Espacement entre l'icône et le titre
+                        Text(club,style: TextStyle(fontSize: 15)),
+                      ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+   Future<List<String>> fetchClubFromFirebase() async {
+    CollectionReference usersCollection = FirebaseFirestore.instance.collection('utilisateurs');
+    DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
+
+    if (userSnapshot.exists && userSnapshot.data() != null) {
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+      if (userData.containsKey('club')) {
+        List<dynamic> clubsData = userData['club'];
+        List<String> clubs = clubsData.map((subscription) => subscription.toString()).toList();
+        return clubs;
+      }
+    }
+    return [];
+  }
+
+  void showLigueList(BuildContext context) async {
+    List<String> ligues = await fetchLigueFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos ligues suivis'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: ligues.map((ligue) {
+                return Container(
+                  child: Column( 
+                    children: [
+                      Row(
+                      children: [
+                        Image.asset('assets/${ligue}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                        SizedBox(width: 10), // Espacement entre l'icône et le titre
+                        Text(ligue,style: TextStyle(fontSize: 15)),
+                      ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+   Future<List<String>> fetchLigueFromFirebase() async {
+    CollectionReference usersCollection = FirebaseFirestore.instance.collection('utilisateurs');
+    DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
+
+    if (userSnapshot.exists && userSnapshot.data() != null) {
+      Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+      if (userData.containsKey('ligue')) {
+        List<dynamic> liguesData = userData['ligue'];
+        List<String> ligues = liguesData.map((subscription) => subscription.toString()).toList();
+        return ligues;
+      }
+    }
+    return [];
   }
 }
 
-class UserProfilePage extends StatelessWidget {
-  final DocumentSnapshot user;
+class UserProfilePage extends StatefulWidget {
+  final String userPseudo;
+  final String? myUserID;
 
-  UserProfilePage(this.user);
+  UserProfilePage(this.userPseudo,this.myUserID);
+
+  @override
+  _UserProfilePageState createState() => _UserProfilePageState(userPseudo,myUserID);
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
+  final String userPseudo;
+  final String? myUserID;
+
+  _UserProfilePageState(this.userPseudo,this.myUserID);
+
+  Future<DocumentSnapshot?> searchUsers(String searchTerm) async {
+    var querySnapshot = await FirebaseFirestore.instance
+      .collection('utilisateurs')
+      .where('pseudo', isEqualTo: searchTerm)
+      .limit(1)
+      .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first;
+    } else {
+      return null; // Aucun résultat trouvé
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profil de ${user['pseudo']}'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Add subscription logic here
-          },
-          child: Text('S\'abonner'),
-        ),
-      ),
+    return FutureBuilder<DocumentSnapshot?>(
+      future: searchUsers(userPseudo),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError || snapshot.data == null) {
+          return const Center(
+            child: Text('Une erreur est survenue ou aucun résultat trouvé'),
+          );
+        } else {
+          final userData = snapshot.data!.data() as Map<String, dynamic>;
+          String photoUrl = userData['photoUrl'] ?? '';
+          if(photoUrl == ''){
+            photoUrl = 'assets/Inconnu.png';
+          }
+          final description = userData['description'] ?? '';
+          int followingCount = (userData['amis'] as List<dynamic>?)?.length ?? 0;
+          int clubsCount = (userData['club'] as List<dynamic>?)?.length ?? 0;
+          int leaguesCount = (userData['ligue'] as List<dynamic>?)?.length ?? 0;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Profil de ${userData['pseudo']}'),
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoUrl),
+                          radius: 50,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          userPseudo,
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    InkWell(
+                      onTap: () {
+                        showAbonneList(context, userPseudo);
+                      },
+                      child: Column(
+                        children: [
+                          FutureBuilder<int>(
+                            future: getFollowersCount(userPseudo),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else {
+                                final followersCount = snapshot.data ?? 0;
+                                return Text(
+                                  '$followersCount',
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                );
+                              }
+                            },
+                          ),
+                          const Text('Abonnés'),
+                        ]
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
+                      onTap: () {
+                        showAbonnementList(context);
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            '$followingCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Abonnements'),
+                        ]
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
+                      onTap: () {
+                        showClubList(context);
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            '$clubsCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Clubs suivis'),
+                        ]
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
+                        onTap: () {
+                          showLigueList(context);
+                        },
+                        child: Column(
+                        children: [
+                          Text(
+                            '$leaguesCount',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const Text('Ligues suivies'),
+                        ]
+                      ),
+                    ),
+                  ],),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      Text(description),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: () async {
+                      bool? isSubscribed = await estAbonne();
+                      if (isSubscribed) {
+                        // Si l'utilisateur est déjà abonné, le désabonner
+                        removeUser();
+                      } else {
+                        // Sinon, l'abonner
+                        addUser();
+                      }
+                    },
+                    child: FutureBuilder<bool>(
+                      future: estAbonne(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Text('Chargement...'); // Afficher un texte de chargement pendant que nous attendons le résultat
+                        }
+                        if (snapshot.hasError || snapshot.data == null) {
+                          return Text('Erreur'); // Afficher un message d'erreur si la récupération a échoué ou si la valeur est nulle
+                        }
+                        return Text(snapshot.data! ? 'Se désabonner' : 'S\'abonner'); // Utiliser le résultat retourné par estAbonne()
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        }
+      }
     );
+  }
+  Future<int> getFollowersCount(String userPseudo) async {
+    int compteur = 0;
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] != userPseudo){
+        if(doc["amis"].contains(userPseudo)){
+          compteur++;
+        }
+      }
+    });
+    return compteur;
+  }
+  void showAbonneList(BuildContext context, String pseudo) async {
+    List<Amis> subscriptions = await fetchAbonneFromFirebase(pseudo);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos abonnés'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: subscriptions.map((subscription) {
+                String urlAbo = subscription.url;
+                if(urlAbo == ""){
+                  urlAbo = "assets/Inconnu.png";
+                }
+                return ListTile(
+                  title: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(urlAbo),
+                            radius: 15,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(subscription.name,style: const TextStyle(fontSize: 15))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<List<Amis>> fetchAbonneFromFirebase(String userPseudo) async {
+    List<Amis> abonne = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] != userPseudo){
+        if(doc["amis"].contains(userPseudo)){
+          abonne.add(Amis(doc["pseudo"],doc["photoUrl"]));
+        }
+      }
+    });
+    return abonne;
+  }
+
+  Future<bool> estAbonne() async {
+    final abo = await FirebaseFirestore.instance.collection('utilisateurs').doc(myUserID).get();
+    if(abo["amis"].contains(userPseudo)){
+      return true;
+    }
+    return false;
+  }
+
+  void showAbonnementList(BuildContext context) async {
+    List<Amis> subscriptions = await fetchAbonnementFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos abonnements'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: subscriptions.map((subscription) {
+                String urlAbo = subscription.url;
+                if(urlAbo == ""){
+                  urlAbo = "assets/Inconnu.png";
+                }
+                return ListTile(
+                  title: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(urlAbo),
+                            radius: 15,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(subscription.name,style: const TextStyle(fontSize: 15))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<String> recupUrl(String userPseudo) async{
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    String photoUrl = "";
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] == userPseudo){
+        photoUrl = doc["photoUrl"];
+      }
+    });
+    return photoUrl;
+  }
+  Future<List<Amis>> fetchAbonnementFromFirebase() async {
+    List<Amis> abonnement = [];
+    String url;
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('utilisateurs').get();
+    await Future.forEach(querySnapshot.docs, (doc) async {
+      if (doc["pseudo"] == userPseudo) {
+        await Future.forEach(doc["amis"], (dynamic a) async {
+          url = await recupUrl(a);
+          abonnement.add(Amis(a, url));
+        });
+      }
+    });
+    return abonnement;
+  }
+
+  void showClubList(BuildContext context) async {
+    List<String> clubs = await fetchClubFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos clubs suivis'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: clubs.map((club) {
+                return Container(
+                  child: Column(
+                    children: [
+                      Row(
+                      children: [
+                        Image.asset('assets/${club}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                        SizedBox(width: 10), // Espacement entre l'icône et le titre
+                        Text(club,style: TextStyle(fontSize: 15)),
+                      ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+   Future<List<String>> fetchClubFromFirebase() async {
+    List<String> club = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] == userPseudo){
+        List<dynamic> clubData = doc['club'];
+        club = clubData.map((c) => c.toString()).toList();
+      }
+    });
+    return club;
+  }
+
+  void showLigueList(BuildContext context) async {
+    List<String> ligues = await fetchLigueFromFirebase();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vos ligues suivis'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: ligues.map((ligue) {
+                return Container(
+                  child: Column( 
+                    children: [
+                      Row(
+                      children: [
+                        Image.asset('assets/${ligue}.png', width: 30, height: 30) ,// Ici vous pouvez remplacer l'icône par votre propre image/logo
+                        SizedBox(width: 10), // Espacement entre l'icône et le titre
+                        Text(ligue,style: TextStyle(fontSize: 15)),
+                      ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<List<String>> fetchLigueFromFirebase() async {
+    List<String> ligue = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+    querySnapshot.docs.forEach((doc) {
+      if(doc["pseudo"] == userPseudo){
+        List<dynamic> ligueData = doc['club'];
+        ligue = ligueData.map((l) => l.toString()).toList();
+      }
+    });
+    return ligue;
+  }
+  void addUser() async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('utilisateurs').doc(myUserID);
+      await userRef.update({'amis': FieldValue.arrayUnion([userPseudo])});
+      print('Amis mis à jour avec succès dans Firebase !');
+    } catch (error) {
+      print('Erreur lors de la mise à jour des amis dans Firebase: $error');
+    }
+  }
+  void removeUser() async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('utilisateurs').doc(myUserID);
+      await userRef.update({'amis': FieldValue.arrayRemove([userPseudo])});
+      print('Amis retiré avec succès de Firebase !');
+    } catch (error) {
+      print('Erreur lors de la suppression des amis de Firebase: $error');
+    }
   }
 }
 
