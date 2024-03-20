@@ -2651,7 +2651,7 @@ class _MainPageState extends State<MainPage> {
       IconButton(
         icon: const Icon(Icons.exit_to_app),
         onPressed: () {
-          FirebaseAuth.instance.signOut(); // Déconnexion de l'utilisateur
+          _showLogoutConfirmationDialog(context); // Déconnexion de l'utilisateur
         },
       ),
   ],
