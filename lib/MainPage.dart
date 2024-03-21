@@ -3417,13 +3417,19 @@ class Classement extends StatelessWidget {
           itemBuilder: (context, index) {
             return Row(
               children:[
-                Text('${index+1} )'),
+                Text(
+                  '${index+1} )',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
                 Image.asset(
                   'assets/${sortedTeams[index].key}.png',
                   height: 30,
                   width: 30,
                 ),
-                Text('${sortedTeams[index].key} : ${sortedTeams[index].value} points'),
+                Text(
+                  '${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
               ]
             );
           },
