@@ -1080,8 +1080,10 @@ class _ProfileState extends State<Profile> {
       },
     );
   }
+
   Future<List<String>> fetchClubFromFirebase() async {
-    CollectionReference usersCollection = FirebaseFirestore.instance.collection('utilisateurs');
+    CollectionReference usersCollection =
+        FirebaseFirestore.instance.collection('utilisateurs');
     DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
 
     if (userSnapshot.exists && userSnapshot.data() != null) {
@@ -2908,7 +2910,7 @@ class Classement extends StatelessWidget {
             return Row(
               children:[
                 Text(
-                  '${index+1} ) ',
+                  '${index+1} )',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
                 Image.asset(
@@ -2917,7 +2919,7 @@ class Classement extends StatelessWidget {
                   width: 30,
                 ),
                 Text(
-                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  '${sortedTeams[index].key} : ${sortedTeams[index].value} points',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
               ]
@@ -3035,7 +3037,7 @@ class Classement extends StatelessWidget {
             return Row(
               children:[
                 Text(
-                  '${index+1} ) ',
+                  '${index+1} )',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
                 Image.asset(
@@ -3044,7 +3046,7 @@ class Classement extends StatelessWidget {
                   width: 30,
                 ),
                 Text(
-                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  '${sortedTeams[index].key} : ${sortedTeams[index].value} points',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
               ]
@@ -3162,7 +3164,7 @@ class Classement extends StatelessWidget {
             return Row(
               children:[
                 Text(
-                  '${index+1} ) ',
+                  '${index+1} )',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
                 Image.asset(
@@ -3171,7 +3173,7 @@ class Classement extends StatelessWidget {
                   width: 30,
                 ),
                 Text(
-                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  '${sortedTeams[index].key} : ${sortedTeams[index].value} points',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
               ]
@@ -3289,7 +3291,7 @@ class Classement extends StatelessWidget {
             return Row(
               children:[
                 Text(
-                  '${index+1} ) ',
+                  '${index+1} )',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
                 Image.asset(
@@ -3298,7 +3300,7 @@ class Classement extends StatelessWidget {
                   width: 30,
                 ),
                 Text(
-                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  '${sortedTeams[index].key} : ${sortedTeams[index].value} points',
                   style: const TextStyle(fontWeight: FontWeight.bold,)
                 ),
               ]
@@ -3415,19 +3417,13 @@ class Classement extends StatelessWidget {
           itemBuilder: (context, index) {
             return Row(
               children:[
-                Text(
-                  '${index+1} ) ',
-                  style: const TextStyle(fontWeight: FontWeight.bold,)
-                ),
+                Text('${index+1} )'),
                 Image.asset(
                   'assets/${sortedTeams[index].key}.png',
                   height: 30,
                   width: 30,
                 ),
-                Text(
-                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
-                  style: const TextStyle(fontWeight: FontWeight.bold,)
-                ),
+                Text('${sortedTeams[index].key} : ${sortedTeams[index].value} points'),
               ]
             );
           },
