@@ -198,74 +198,422 @@ class ModifPseudo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: Text(
-          'Modifier son pseudo',
-          style: TextStyle(
-            color: Colors.black, // Couleur du texte en noir
-            fontWeight: FontWeight.normal, // Poids de la police normal
-            decoration: TextDecoration.none,
-            fontSize: 18, // Aucune décoration de texte
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Modifier son pseudo'),
+      ),
+      body: ModifierPseudoForm(),
+    );
+  }
+}
+
+class ModifierPseudoForm extends StatefulWidget {
+  @override
+  _ModifierPseudoFormState createState() => _ModifierPseudoFormState();
+}
+
+class _ModifierPseudoFormState extends State<ModifierPseudoForm> {
+  final TextEditingController _pseudoController = TextEditingController();
+  String _errorMessage = '';
+  String _pseudo = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getUserPseudo();
+  }
+
+  Future<void> getUserPseudo() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot<Map<String, dynamic>> userData = await FirebaseFirestore
+          .instance
+          .collection('utilisateurs')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        _pseudo = userData.data()?['pseudo'] ?? '';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_pseudo.isNotEmpty)
+            Text(
+              'Pseudo actuel : $_pseudo',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          TextField(
+            controller: _pseudoController,
+            decoration: InputDecoration(
+              labelText: 'Nouveau pseudo',
+            ),
           ),
-        ),
-      );
+          if (_errorMessage.isNotEmpty)
+            Text(
+              _errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              modifierPseudo(context);
+            },
+            child: Text('Modifier'),
+          ),
+        ],
+      ),
+    );
+  }
+  void modifierPseudo(BuildContext context) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('utilisateurs')
+            .doc(user.uid)
+            .update({'pseudo': _pseudoController.text});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pseudo modifié avec succès'),
+          ),
+        );
+        Navigator.pop(
+            context); // Retour à l'écran précédent après la modification
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Erreur lors de la modification du pseudo : $e';
+      });
+    }
   }
 }
 
 class ModifMail extends StatelessWidget {
-  const ModifMail({super.key});
+  const ModifMail({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: Text(
-          'Modifier son mail',
-          style: TextStyle(
-            color: Colors.black, // Couleur du texte en noir
-            fontWeight: FontWeight.normal, // Poids de la police normal
-            decoration: TextDecoration.none,
-            fontSize: 18, // Aucune décoration de texte
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Modifier son adresse e-mail'),
+      ),
+      body: ModifierMailForm(),
+    );
+  }
+}
+
+class ModifierMailForm extends StatefulWidget {
+  @override
+  _ModifierMailFormState createState() => _ModifierMailFormState();
+}
+
+class _ModifierMailFormState extends State<ModifierMailForm> {
+  final TextEditingController _emailController = TextEditingController();
+  String _errorMessage = '';
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getUserEmail();
+  }
+
+  Future<void> getUserEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _email = user.email ?? '';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_email.isNotEmpty)
+            Text(
+              'Adresse e-mail actuelle : $_email',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          TextField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              labelText: 'Nouvelle adresse e-mail',
+            ),
           ),
-        ),
-      );
+          if (_errorMessage.isNotEmpty)
+            Text(
+              _errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              modifierMail(context);
+            },
+            child: Text('Modifier'),
+          ),
+        ],
+      ),
+    );
+  }
+  void modifierMail(BuildContext context) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user.verifyBeforeUpdateEmail(_emailController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Un lien de vérification a été envoyé à votre nouvelle adresse e-mail. Veuillez vérifier et suivre les instructions pour confirmer le changement.'),
+          ),
+        );
+        Navigator.pop(
+            context); // Retour à l'écran précédent après la modification
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage =
+            'Erreur lors de la modification de l\'adresse e-mail : $e';
+      });
+    }
   }
 }
 
 class ModifMdp extends StatelessWidget {
-  const ModifMdp({super.key});
+  const ModifMdp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: Text(
-          'Modifier son mot de passe',
-          style: TextStyle(
-            color: Colors.black, // Couleur du texte en noir
-            fontWeight: FontWeight.normal, // Poids de la police normal
-            decoration: TextDecoration.none,
-            fontSize: 18, // Aucune décoration de texte
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Modifier son mot de passe'),
+      ),
+      body: ModifierMotDePasseForm(),
+    );
+  }
+}
+
+class ModifierMotDePasseForm extends StatefulWidget {
+  @override
+  _ModifierMotDePasseFormState createState() => _ModifierMotDePasseFormState();
+}
+
+class _ModifierMotDePasseFormState extends State<ModifierMotDePasseForm> {
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  String _errorMessage = '';
+
+  @override
+  Widget build(BuildContext context) {
+     return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextField(
+            controller: _oldPasswordController,
+            decoration: InputDecoration(
+              labelText: 'Ancien mot de passe',
+            ),
+            obscureText: true,
           ),
-        ),
-      );
+          TextField(
+            controller: _newPasswordController,
+            decoration: InputDecoration(
+              labelText: 'Nouveau mot de passe',
+            ),
+            obscureText: true,
+          ),
+          TextField(
+            controller: _confirmPasswordController,
+            decoration: InputDecoration(
+              labelText: 'Confirmer le nouveau mot de passe',
+            ),
+            obscureText: true,
+          ),
+          if (_errorMessage.isNotEmpty)
+            Text(
+              _errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              modifierMotDePasse(context);
+            },
+            child: Text('Modifier'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void modifierMotDePasse(BuildContext context) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String newPassword = _newPasswordController.text;
+
+        // Vérifier si le nouveau mot de passe respecte les critères
+        if (!_verifierMotDePasse(newPassword)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Le nouveau mot de passe ne respecte pas les critères requis. Une majuscule, un caractère spécial, un chiffre et 8 caractères minimums sont requis.'),
+            ),
+          );
+          return;
+        }
+
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: _oldPasswordController.text,
+        );
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Mot de passe modifié avec succès'),
+          ),
+        );
+        Navigator.pop(
+            context); // Retour à l'écran précédent après la modification
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Erreur lors de la modification du mot de passe : $e';
+      });
+    }
+  }
+
+  bool _verifierMotDePasse(String password) {
+    // Vérifier si le mot de passe contient au moins une majuscule, un caractère spécial et un chiffre, et a une longueur d'au moins 8 caractères
+    String pattern = r'^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
   }
 }
 
 class SupCompte extends StatelessWidget {
-  const SupCompte({super.key});
+  const SupCompte({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-        child: Text(
-          'Supprimer son compte',
-          style: TextStyle(
-            color: Colors.black, // Couleur du texte en noir
-            fontWeight: FontWeight.normal, // Poids de la police normal
-            decoration: TextDecoration.none,
-            fontSize: 18, // Aucune décoration de texte
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Supprimer son compte'),
+      ),
+      body: SupprimerCompteConfirmation(),
+    );
+  }
+}
+
+class SupprimerCompteConfirmation extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Êtes-vous sûr de vouloir supprimer votre compte ?',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              confirmerSuppressionCompte(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+            ),
+            child: Text(
+              'Confirmer la suppression',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void confirmerSuppressionCompte(BuildContext context) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Supprimer l'utilisateur de la liste d'amis de tous les autres utilisateurs
+        QuerySnapshot friendLists =
+            await FirebaseFirestore.instance.collection('utilisateurs').get();
+        for (QueryDocumentSnapshot userDoc in friendLists.docs) {
+          await FirebaseFirestore.instance
+              .collection('utilisateurs')
+              .doc(userDoc.id)
+              .update({
+            'amis': FieldValue.arrayRemove(
+                [user.uid]) // Supprimer l'utilisateur de la liste d'amis
+          });
+        }
+
+        // Supprimer le document de l'utilisateur
+        await FirebaseFirestore.instance
+            .collection('utilisateurs')
+            .doc(user.uid)
+            .delete();
+
+        // Supprimer l'utilisateur
+        await user.delete();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Votre compte a été supprimé avec succès'),
+          ),
+        );
+
+        // Afficher un dialog de confirmation avant de rediriger vers MyApp
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Compte supprimé"),
+              content: Text("Votre compte a été supprimé avec succès."),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyApp()),
+                    );
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la suppression du compte : $e'),
         ),
       );
+    }
   }
 }
 
@@ -1653,7 +2001,9 @@ class Matches extends StatelessWidget {
               ),],),
 
               children: <Widget>[
-              Card(
+              InkWell(
+                onTap: (){},
+                child: Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -1770,6 +2120,7 @@ class Matches extends StatelessWidget {
                   );
                 },
               ),
+              ),
             ),
           ),
               ],
@@ -1791,7 +2142,9 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              Card(
+              InkWell(
+                onTap: (){},
+                child: Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -1908,6 +2261,7 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
+              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -1927,7 +2281,9 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              Card(
+              InkWell(
+                onTap: (){},
+                child: Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2044,6 +2400,7 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
+              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -2063,7 +2420,9 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              Card(
+              InkWell(
+                onTap: (){},
+                child: Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2180,6 +2539,7 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
+              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -2199,7 +2559,9 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              Card(
+              InkWell(
+                onTap: (){},
+                child: Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2316,6 +2678,7 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
+              ),
               ],
           ),
           const SizedBox(height: 10),
@@ -2449,7 +2812,9 @@ class Home extends StatelessWidget {
                                 List<String> paragraphes = List.from(data['Paragraphes']);
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
-                                  child:Card(
+                                  child: InkWell(
+                                    onTap: (){_showArticleContent(context,data,paragraphes);},
+                                    child: Card(
                                   color: Colors.white,
                                   elevation: 5,
                                   child: Padding(
@@ -2466,29 +2831,29 @@ class Home extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 20),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: paragraphes.map((paragraphe) {
-                                            if (paragraphe.endsWith(".jpg")) {
-                                              // Si le paragraphe se termine par ".jpg", afficher une image
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
-                                                child: Image.network(
-                                                  paragraphe,
-                                                ),
-                                              );
-                                            } else {
-                                              // Sinon, afficher du texte
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
-                                                child: Text(paragraphe),
-                                              );
-                                            }
-                                          }).toList(),
-                                        ),
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: paragraphes.map((paragraphe) {
+                                          if (paragraphe.endsWith(".jpg")) {
+                                            // Si le paragraphe se termine par ".jpg", afficher une image
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                              child: Column(children: [Image.network(
+                                                paragraphe,
+                                              ),const Text("...")]
+                                            ));
+                                          } else {
+                                            // Sinon, afficher du texte
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                              child: Column(children: [Text("$paragraphe ...")])
+                                            );
+                                          }
+                                        }).take(1).toList(),
+                                      ),
                                       ],
                                     ),
                                   ),
-                                ));
+                                )));
                               } else if (document.reference.parent.id == 'match') {
                                 // Si le document provient de la collection 'match'
                                 Map<String, dynamic> data = document.data() as Map<String, dynamic>;
@@ -2514,7 +2879,9 @@ class Home extends StatelessWidget {
                           followLeagues.contains(data['Compet'])) {
                         return Padding(
                             padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
-                            child: Card(
+                            child: InkWell( 
+                              onTap: (){},
+                              child: Card(
                             color: Colors.white,
                             elevation: 5,
                             child: Column(
@@ -2592,7 +2959,7 @@ class Home extends StatelessWidget {
   )
                             ]
                           ),
-                          ));
+                          )));
                       } else{
                         // Handle other content types if any
                         return Container();
@@ -2625,7 +2992,9 @@ class Home extends StatelessWidget {
                               List<String> paragraphes = List.from(data['Paragraphes']);
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
-                                child:Card(
+                                child: InkWell(
+                                  onTap: (){_showArticleContent(context,data,paragraphes);},
+                                  child: Card(
                                 color: Colors.white,
                                 elevation: 5,
                                 child: Padding(
@@ -2648,23 +3017,23 @@ class Home extends StatelessWidget {
                                             // Si le paragraphe se termine par ".jpg", afficher une image
                                             return Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
-                                              child: Image.network(
+                                              child: Column(children: [Image.network(
                                                 paragraphe,
-                                              ),
-                                            );
+                                              ),const Text("...")]
+                                            ));
                                           } else {
                                             // Sinon, afficher du texte
                                             return Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
-                                              child: Text(paragraphe),
+                                              child: Column(children: [Text("$paragraphe ...")])
                                             );
                                           }
-                                        }).toList(),
+                                        }).take(1).toList(),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ));
+                              )));
                             } else if (document.reference.parent.id == 'match') {
                               // Si le document provient de la collection 'match'
                               Map<String, dynamic> data = document.data() as Map<String, dynamic>;
@@ -2690,7 +3059,9 @@ class Home extends StatelessWidget {
                         followLeagues.contains(data['Compet'])) {
                       return Padding(
                           padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
-                          child: Card(
+                          child: InkWell(
+                            onTap: (){},
+                            child: Card(
                           color: Colors.white,
                           elevation: 5,
                           child: Column(
@@ -2768,7 +3139,7 @@ class Home extends StatelessWidget {
 )
                           ]
                         ),
-                        ));
+                        )));
                     } else{
                       // Handle other content types if any
                       return Container();
@@ -2782,6 +3153,54 @@ class Home extends StatelessWidget {
           )
         )
       )
+    );
+  }
+   void _showArticleContent(BuildContext context, Map<String, dynamic> data, List<String> paragraphes) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data['Titre'], // Assurez-vous que 'data' est accessible ici
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: paragraphes.map((paragraphe) {
+                    if (paragraphe.endsWith(".jpg")) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Image.network(paragraphe),
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Text(paragraphe),
+                      );
+                    }
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
