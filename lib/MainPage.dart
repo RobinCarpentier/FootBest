@@ -1080,7 +1080,7 @@ class _ProfileState extends State<Profile> {
       },
     );
   }
-   Future<List<String>> fetchClubFromFirebase() async {
+  Future<List<String>> fetchClubFromFirebase() async {
     CollectionReference usersCollection = FirebaseFirestore.instance.collection('utilisateurs');
     DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
 
@@ -1317,6 +1317,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         // Sinon, l'abonner
                         addUser();
                       }
+                      setState((){});
                     },
                     child: FutureBuilder<bool>(
                       future: estAbonne(),
@@ -1625,21 +1626,34 @@ class Matches extends StatelessWidget {
         child: Center(
           child: Column(
             children:[
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              const Text(
+                "Matchs",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
               ExpansionTile(
-              title: const Text(
+              title: Row( children: [
+              Image.asset(
+                'assets/Ligue 1.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
                 'Ligue 1',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),],),
 
               children: <Widget>[
               Card(
             elevation: 5,
             child: Container(
-              padding: const EdgeInsets.all(10),
               child: StreamBuilder<QuerySnapshot>(
                 stream: match.where('Compet', isEqualTo: 'Ligue 1').orderBy('Date', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1692,30 +1706,29 @@ class Matches extends StatelessWidget {
                         return Column(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34) : ',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                  ),
-                                  ),
+                                  )
+                                ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Column(
+                                  Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       // Logo de l'équipe A
                                       Image.asset(
                                         'assets/${data['Equipe A']}.png',
-                                        width: 100,
-                                        height: 100,
+                                        width: 30,
+                                        height: 30,
                                       ),
                                       // Nom de l'équipe A
                                       Text(
-                                        '${data['Equipe A']}',
-                                        style: const TextStyle(fontSize: 15),
+                                        ' ${data['Equipe A']} ',
+                                        style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                       ),
                                     ],
                                   ),
@@ -1723,29 +1736,28 @@ class Matches extends StatelessWidget {
                                   // Score du match
                                   Text(
                                     '$goalsTeamA - $goalsTeamB',
-                                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
                                   // Nom de l'équipe B
-                                  Column(
+                                  Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
+                                      // Nom de l'équipe B
+                                      Text(
+                                        ' ${data['Equipe B']} ',
+                                        style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
+                                      ),
                                       // Logo de l'équipe B
                                       Image.asset(
                                         'assets/${data['Equipe B']}.png',
-                                        width: 100,
-                                        height: 100,
-                                      ),
-                                      // Nom de l'équipe B
-                                      Text(
-                                        '${data['Equipe B']}',
-                                        style: const TextStyle(fontSize: 15),
+                                        width: 30,
+                                        height: 30,
                                       ),
                                     ],
                                   ),
                                 ]
-                              ),
-                          const SizedBox(height: 20), // Espacement à la fin
+                              ), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
                       ),
@@ -1762,19 +1774,24 @@ class Matches extends StatelessWidget {
               ),
           const SizedBox(height: 20),
           ExpansionTile(
-          title: const Text(
+          title: Row( children: [
+              Image.asset(
+                'assets/Premier League.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
                 'Premier League',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),],),
               
               children: <Widget>[
               Card(
             elevation: 5,
             child: Container(
-              padding: const EdgeInsets.all(20),
               child: StreamBuilder<QuerySnapshot>(
                 stream: match.where('Compet', isEqualTo: 'Premier League').orderBy('Date', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1827,30 +1844,27 @@ class Matches extends StatelessWidget {
                         return Column(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38) : ',
+                                  style: const TextStyle(fontWeight: FontWeight.bold,),
                                   ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     // Logo de l'équipe A
                                     Image.asset(
                                       'assets/${data['Equipe A']}.png',
-                                      width: 100,
-                                      height: 100,
+                                      width: 30,
+                                      height: 30,
                                     ),
                                     // Nom de l'équipe A
                                     Text(
-                                      '${data['Equipe A']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      ' ${data['Equipe A']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                     ),
                                   ],
                                 ),
@@ -1858,29 +1872,28 @@ class Matches extends StatelessWidget {
                                 // Score du match
                                 Text(
                                   '$goalsTeamA - $goalsTeamB',
-                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                 ),
                                 const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
                                 // Nom de l'équipe B
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // Nom de l'équipe B
+                                    Text(
+                                      ' ${data['Equipe B']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
+                                    ),
                                     // Logo de l'équipe B
                                     Image.asset(
                                       'assets/${data['Equipe B']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe B
-                                    Text(
-                                      '${data['Equipe B']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      width: 30,
+                                      height: 30,
                                     ),
                                   ],
                                 ),
                               ]
                             ),
-                          const SizedBox(height: 20), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
                       )
@@ -1897,19 +1910,24 @@ class Matches extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ExpansionTile(
-          title: const Text(
+          title: Row( children: [
+              Image.asset(
+                'assets/La Liga.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
                 'La Liga',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),],),
               
               children: <Widget>[
               Card(
             elevation: 5,
             child: Container(
-              padding: const EdgeInsets.all(20),
               child: StreamBuilder<QuerySnapshot>(
                 stream: match.where('Compet', isEqualTo: 'La Liga').orderBy('Date', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1962,30 +1980,27 @@ class Matches extends StatelessWidget {
                         return Column(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38) : ',
+                                  style: const TextStyle(fontWeight: FontWeight.bold,)
                                   ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     // Logo de l'équipe A
                                     Image.asset(
                                       'assets/${data['Equipe A']}.png',
-                                      width: 100,
-                                      height: 100,
+                                      width: 30,
+                                      height: 30,
                                     ),
                                     // Nom de l'équipe A
                                     Text(
-                                      '${data['Equipe A']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      ' ${data['Equipe A']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                     ),
                                   ],
                                 ),
@@ -1993,29 +2008,28 @@ class Matches extends StatelessWidget {
                                 // Score du match
                                 Text(
                                   '$goalsTeamA - $goalsTeamB',
-                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                 ),
                                 const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
                                 // Nom de l'équipe B
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // Nom de l'équipe B
+                                    Text(
+                                      ' ${data['Equipe B']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
+                                    ),
                                     // Logo de l'équipe B
                                     Image.asset(
                                       'assets/${data['Equipe B']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe B
-                                    Text(
-                                      '${data['Equipe B']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      width: 30,
+                                      height: 30,
                                     ),
                                   ],
                                 ),
                               ]
                             ),
-                          const SizedBox(height: 20), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
                       )
@@ -2032,19 +2046,24 @@ class Matches extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ExpansionTile(
-          title: const Text(
+          title: Row( children: [
+              Image.asset(
+                'assets/Serie A.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
                 'Serie A',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),],),
               
               children: <Widget>[
               Card(
             elevation: 5,
             child: Container(
-              padding: const EdgeInsets.all(20),
               child: StreamBuilder<QuerySnapshot>(
                 stream: match.where('Compet', isEqualTo: 'Serie A').orderBy('Date', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -2097,30 +2116,27 @@ class Matches extends StatelessWidget {
                         return Column(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 38) : ',
+                                  style: const TextStyle(fontWeight: FontWeight.bold,)
                                   ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     // Logo de l'équipe A
                                     Image.asset(
                                       'assets/${data['Equipe A']}.png',
-                                      width: 100,
-                                      height: 100,
+                                      width: 30,
+                                      height: 30,
                                     ),
                                     // Nom de l'équipe A
                                     Text(
-                                      '${data['Equipe A']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      ' ${data['Equipe A']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                     ),
                                   ],
                                 ),
@@ -2128,29 +2144,28 @@ class Matches extends StatelessWidget {
                                 // Score du match
                                 Text(
                                   '$goalsTeamA - $goalsTeamB',
-                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                 ),
                                 const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
                                 // Nom de l'équipe B
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // Nom de l'équipe B
+                                    Text(
+                                      ' ${data['Equipe B']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
+                                    ),
                                     // Logo de l'équipe B
                                     Image.asset(
                                       'assets/${data['Equipe B']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe B
-                                    Text(
-                                      '${data['Equipe B']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      width: 30,
+                                      height: 30,
                                     ),
                                   ],
                                 ),
                               ]
                             ),
-                          const SizedBox(height: 20), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
                       )
@@ -2167,19 +2182,24 @@ class Matches extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ExpansionTile(
-          title: const Text(
+          title: Row( children: [
+              Image.asset(
+                'assets/Bundesliga.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
                 'Bundesliga',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),],),
               
               children: <Widget>[
               Card(
             elevation: 5,
             child: Container(
-              padding: const EdgeInsets.all(20),
               child: StreamBuilder<QuerySnapshot>(
                 stream: match.where('Compet', isEqualTo: 'Bundesliga').orderBy('Date', descending: true).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -2232,30 +2252,27 @@ class Matches extends StatelessWidget {
                         return Column(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  '${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34) : ',
+                                  style: const TextStyle(fontWeight: FontWeight.bold,)
                                   ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     // Logo de l'équipe A
                                     Image.asset(
                                       'assets/${data['Equipe A']}.png',
-                                      width: 100,
-                                      height: 100,
+                                      width: 30,
+                                      height: 30,
                                     ),
                                     // Nom de l'équipe A
                                     Text(
-                                      '${data['Equipe A']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      ' ${data['Equipe A']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                     ),
                                   ],
                                 ),
@@ -2263,29 +2280,28 @@ class Matches extends StatelessWidget {
                                 // Score du match
                                 Text(
                                   '$goalsTeamA - $goalsTeamB',
-                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
                                 ),
                                 const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
                                 // Nom de l'équipe B
-                                Column(
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // Nom de l'équipe B
+                                    Text(
+                                      ' ${data['Equipe B']} ',
+                                      style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,),
+                                    ),
                                     // Logo de l'équipe B
                                     Image.asset(
                                       'assets/${data['Equipe B']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe B
-                                    Text(
-                                      '${data['Equipe B']}',
-                                      style: const TextStyle(fontSize: 15),
+                                      width: 30,
+                                      height: 30,
                                     ),
                                   ],
                                 ),
                               ]
                             ),
-                          const SizedBox(height: 20), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
                       )
@@ -2316,6 +2332,22 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     CollectionReference match = FirebaseFirestore.instance.collection('match');
     CollectionReference article = FirebaseFirestore.instance.collection('article');
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
+    Future<List<String>> getUserFollowClub() async {
+      List<String> followClub = [];
+      DocumentSnapshot<Map<String, dynamic>> userFollowClub =
+          await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get();
+      followClub = List.from(userFollowClub['club']);
+      return followClub;
+    }
+
+    Future<List<String>> getUserFollowLeague() async {
+      List<String> followLeague = [];
+      DocumentSnapshot<Map<String, dynamic>> userFollowLeague =
+          await FirebaseFirestore.instance.collection('utilisateurs').doc(userId).get();
+      followLeague = List.from(userFollowLeague['ligue']);
+      return followLeague;
+    }
 
     return Container(
       child: SingleChildScrollView(
@@ -2362,10 +2394,229 @@ class Home extends StatelessWidget {
 
                         allDocuments.sort((a, b) => (b['Date'] as Timestamp).compareTo(a['Date'] as Timestamp));
 
-                        return ListView(
+                        return FutureBuilder(
+                          future: Future.wait([getUserFollowClub(), getUserFollowLeague()]),
+                          builder: (BuildContext context, AsyncSnapshot<List<dynamic>> userSnapshot) {
+                            if (userSnapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+
+                            List<String> followClubs = userSnapshot.data![0];
+                            List<String> followLeagues = userSnapshot.data![1];
+                            List<QueryDocumentSnapshot> filtered = allDocuments.where((match) {
+                              DateTime matchDate = (match['Date'] as Timestamp).toDate();
+                              return matchDate.isBefore(DateTime.now());
+                            }).toList();
+                            List<QueryDocumentSnapshot> filteredMatches = allDocuments
+                              .where((match) {
+                                DateTime matchDate = (match['Date'] as Timestamp).toDate();
+                                return matchDate.isAfter(DateTime.now());
+                              })
+                              .toList();
+
+                            filteredMatches.sort((a, b) {
+                              DateTime dateA = (a['Date'] as Timestamp).toDate();
+                              DateTime dateB = (b['Date'] as Timestamp).toDate();
+                              return dateA.compareTo(dateB);
+                            });
+
+                            // Prendre le premier élément de la liste (le match le plus proche de la date actuelle)
+                            if (filteredMatches.isNotEmpty) {
+                              filteredMatches = [filteredMatches.first];
+                            }
+
+                        return Column(
+                        children: [
+                          filteredMatches.isNotEmpty
+                            ? Column (
+                              children: [const Text(
+                              "Prochain match",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: filteredMatches.map((document) {
+                              if (document.reference.parent.id == 'article') {
+                                // Si le document provient de la collection 'article'
+                                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                                List<String> paragraphes = List.from(data['Paragraphes']);
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
+                                  child:Card(
+                                  color: Colors.white,
+                                  elevation: 5,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10), // Ajoute de l'espace entre le contenu et les bords de la Card
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          data['Titre'],
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: paragraphes.map((paragraphe) {
+                                            if (paragraphe.endsWith(".jpg")) {
+                                              // Si le paragraphe se termine par ".jpg", afficher une image
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                                child: Image.network(
+                                                  paragraphe,
+                                                ),
+                                              );
+                                            } else {
+                                              // Sinon, afficher du texte
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 5), // Ajoute de l'espace entre chaque paragraphe
+                                                child: Text(paragraphe),
+                                              );
+                                            }
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ));
+                              } else if (document.reference.parent.id == 'match') {
+                                // Si le document provient de la collection 'match'
+                                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                                // Compter le nombre de buts pour l'équipe A
+                        Future<int> countGoalsTeamA() async {
+                          QuerySnapshot querySnapshot = await match.doc(document.id)
+                              .collection('but')
+                              .where('Equipe', isEqualTo: 'A')
+                              .get();
+                          return querySnapshot.docs.length;
+                        }
+                        
+                        // Compter le nombre de buts pour l'équipe B
+                        Future<int> countGoalsTeamB() async {
+                          QuerySnapshot querySnapshot = await match.doc(document.id)
+                              .collection('but')
+                              .where('Equipe', isEqualTo: 'B')
+                              .get();
+                          return querySnapshot.docs.length;
+                        }
+                        if (followClubs.contains(data['Equipe A']) ||
+                          followClubs.contains(data['Equipe B']) ||
+                          followLeagues.contains(data['Compet'])) {
+                        return Padding(
+                            padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
+                            child: Card(
+                            color: Colors.white,
+                            elevation: 5,
+                            child: Column(
+                            children: [
+                              Padding(
+    padding: const EdgeInsets.all(10), // Ajoute de l'espace entre le contenu et les bords de la Card
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        FutureBuilder(
+          future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
+          builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+            if (goalsSnapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            int goalsTeamA = goalsSnapshot.data![0];
+            int goalsTeamB = goalsSnapshot.data![1];
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo de l'équipe A
+                    Image.asset(
+                      'assets/${data['Equipe A']}.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    // Nom de l'équipe A
+                    Text(
+                      '${data['Equipe A']}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+                // Score du match
+                Text(
+                  '$goalsTeamA - $goalsTeamB',
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo de l'équipe B
+                    Image.asset(
+                      'assets/${data['Equipe B']}.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    // Nom de l'équipe B
+                    Text(
+                      '${data['Equipe B']}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 20), // Espacement à la fin
+      ],
+    ),
+  )
+                            ]
+                          ),
+                          ));
+                      } else{
+                        // Handle other content types if any
+                        return Container();
+                      }}}).whereType<Widget>().toList()),
+                      const SizedBox(height: 5),
+                      const Divider(
+                        thickness: 2.0, // Épaisseur de la ligne
+                        height: 0, // Hauteur de la ligne (0 pour une ligne horizontale)
+                        indent: 20, // Marge à gauche
+                        endIndent: 20, // Marge à droite
+                      ),
+                      const SizedBox(height: 10),
+                        ])
+                        : Container(),
+                    const Text(
+                      "Accueil",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                        ListView(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          children: allDocuments.map((document) {
+                          children: filtered.map((document) {
                             if (document.reference.parent.id == 'article') {
                               // Si le document provient de la collection 'article'
                               Map<String, dynamic> data = document.data() as Map<String, dynamic>;
@@ -2432,91 +2683,95 @@ class Home extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
-
-                      return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
-                          if (goalsSnapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          }
-
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
-
-                        return Padding(
+                      if (followClubs.contains(data['Equipe A']) ||
+                        followClubs.contains(data['Equipe B']) ||
+                        followLeagues.contains(data['Compet'])) {
+                      return Padding(
                           padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
-                          child:Card(
+                          child: Card(
                           color: Colors.white,
                           elevation: 5,
                           child: Column(
                           children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 10),
-                                Text(
-                                  '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // Logo de l'équipe A
-                                    Image.asset(
-                                      'assets/${data['Equipe A']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe A
-                                    Text(
-                                      '${data['Equipe A']}',
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
-                                // Score du match
-                                Text(
-                                  '$goalsTeamA - $goalsTeamB',
-                                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
-                                // Nom de l'équipe B
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // Logo de l'équipe B
-                                    Image.asset(
-                                      'assets/${data['Equipe B']}.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    // Nom de l'équipe B
-                                    Text(
-                                      '${data['Equipe B']}',
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ],
-                                ),
-                              ]
-                            ),
-                          const SizedBox(height: 20), // Espacement à la fin
-                        ],
-                      )
+                            Padding(
+  padding: const EdgeInsets.all(10), // Ajoute de l'espace entre le contenu et les bords de la Card
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      FutureBuilder(
+        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
+        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+          if (goalsSnapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+
+          int goalsTeamA = goalsSnapshot.data![0];
+          int goalsTeamB = goalsSnapshot.data![1];
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo de l'équipe A
+                  Image.asset(
+                    'assets/${data['Equipe A']}.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  // Nom de l'équipe A
+                  Text(
+                    '${data['Equipe A']}',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+              // Score du match
+              Text(
+                '$goalsTeamA - $goalsTeamB',
+                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo de l'équipe B
+                  Image.asset(
+                    'assets/${data['Equipe B']}.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  // Nom de l'équipe B
+                  Text(
+                    '${data['Equipe B']}',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+      const SizedBox(height: 20), // Espacement à la fin
+    ],
+  ),
+)
                           ]
                         ),
                         ));
-                    }
-                    );
                     } else{
                       // Handle other content types if any
                       return Container();
-                    }}).whereType<Widget>().toList());}
+                    }}}).whereType<Widget>().toList())]);
+                    });}
                     );
                     },
                 )
@@ -2525,6 +2780,670 @@ class Home extends StatelessWidget {
           )
         )
       )
+    );
+  }
+}
+
+class Classement extends StatelessWidget {
+  const Classement({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    CollectionReference listeMatch = FirebaseFirestore.instance.collection('match');
+
+    return Container(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children:[
+              const SizedBox(height: 10),
+              const Text(
+                "Classement",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ExpansionTile(
+              title: Row( children: [
+              Image.asset(
+                'assets/Ligue 1.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
+                'Ligue 1',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),],),
+
+              children: <Widget>[
+              Card(
+            elevation: 5,
+            child: FutureBuilder<QuerySnapshot>(
+  future: listeMatch.where('Compet', isEqualTo: 'Ligue 1').get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    }
+
+    List<DocumentSnapshot> matches = snapshot.data!.docs;
+    List<DocumentSnapshot> matchesToday = matches.where((doc) {
+      DateTime dateMatch = (doc["Date"] as Timestamp).toDate();
+      return dateMatch.isBefore(DateTime.now());
+    }).toList();
+
+    Map<String, int> teamPoints = {};
+    List<String> clubs = [];
+
+    // Fonction asynchrone pour traiter les matchs
+    Future<void> processMatches() async {
+      for (var match in matchesToday) {
+        int AGoals = 0;
+        int BGoals = 0;
+        QuerySnapshot butsSnapshot = await FirebaseFirestore.instance
+          .collection('match')
+          .doc(match.id)
+          .collection('but')
+          .get();
+
+        butsSnapshot.docs.forEach((butDoc) {
+          AGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'A').length;
+          BGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'B').length;
+        });
+
+        if (AGoals > BGoals) {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 3;
+        } else if (AGoals < BGoals) {
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 3;
+        } else {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 1;
+
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 1;
+        }
+      }
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+        querySnapshot.docs.forEach((doc) {
+          if(doc.id == "Ligue 1"){
+            for(int i = 1;i<=18;i++){
+                clubs.add(doc["Equipe $i"]);
+            }
+          }
+        });
+      } catch (e) {
+        print('Error fetching clubs: $e');
+      }
+    }
+
+    // Appeler la fonction asynchrone et attendre sa fin
+    return FutureBuilder<void>(
+      future: processMatches(),
+      builder: (BuildContext context, AsyncSnapshot<void> _) {
+        // Trier les équipes par points
+        List<MapEntry<String, int>> sortedTeams = teamPoints.entries.toList();
+        for(String club in clubs){
+          bool clubExists = sortedTeams.any((entry) => entry.key == club);
+          if(!clubExists){
+            sortedTeams.add(MapEntry(club, 0));
+          }
+        }
+        sortedTeams.sort((a, b) => b.value.compareTo(a.value));
+
+        // Retourner le widget ListView une fois que le traitement est terminé
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedTeams.length,
+          itemBuilder: (context, index) {
+            return Row(
+              children:[
+                Text(
+                  '${index+1} ) ',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+                Image.asset(
+                  'assets/${sortedTeams[index].key}.png',
+                  height: 30,
+                  width: 30,
+                ),
+                Text(
+                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+              ]
+            );
+          },
+        );
+      },
+    );
+  },
+),
+          ),
+              ],
+              ),
+          const SizedBox(height: 20),
+          ExpansionTile(
+          title: Row( children: [
+              Image.asset(
+                'assets/Premier League.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
+                'Premier League',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),],),
+              
+              children: <Widget>[
+              Card(
+            elevation: 5,
+            child: FutureBuilder<QuerySnapshot>(
+  future: listeMatch.where('Compet', isEqualTo: 'Premier League').get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    }
+
+    List<DocumentSnapshot> matches = snapshot.data!.docs;
+    List<DocumentSnapshot> matchesToday = matches.where((doc) {
+      DateTime dateMatch = (doc["Date"] as Timestamp).toDate();
+      return dateMatch.isBefore(DateTime.now());
+    }).toList();
+
+    Map<String, int> teamPoints = {};
+    List<String> clubs = [];
+
+    // Fonction asynchrone pour traiter les matchs
+    Future<void> processMatches() async {
+      for (var match in matchesToday) {
+        int AGoals = 0;
+        int BGoals = 0;
+        QuerySnapshot butsSnapshot = await FirebaseFirestore.instance
+          .collection('match')
+          .doc(match.id)
+          .collection('but')
+          .get();
+
+        butsSnapshot.docs.forEach((butDoc) {
+          AGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'A').length;
+          BGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'B').length;
+        });
+
+        if (AGoals > BGoals) {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 3;
+        } else if (AGoals < BGoals) {
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 3;
+        } else {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 1;
+
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 1;
+        }
+      }
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+        querySnapshot.docs.forEach((doc) {
+          if(doc.id == "Premier League"){
+            for(int i = 1;i<=20;i++){
+                clubs.add(doc["Equipe $i"]);
+            }
+          }
+        });
+      } catch (e) {
+        print('Error fetching clubs: $e');
+      }
+    }
+
+    // Appeler la fonction asynchrone et attendre sa fin
+    return FutureBuilder<void>(
+      future: processMatches(),
+      builder: (BuildContext context, AsyncSnapshot<void> _) {
+        // Trier les équipes par points
+        List<MapEntry<String, int>> sortedTeams = teamPoints.entries.toList();
+        for(String club in clubs){
+          bool clubExists = sortedTeams.any((entry) => entry.key == club);
+          if(!clubExists){
+            sortedTeams.add(MapEntry(club, 0));
+          }
+        }
+        sortedTeams.sort((a, b) => b.value.compareTo(a.value));
+
+        // Retourner le widget ListView une fois que le traitement est terminé
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedTeams.length,
+          itemBuilder: (context, index) {
+            return Row(
+              children:[
+                Text(
+                  '${index+1} ) ',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+                Image.asset(
+                  'assets/${sortedTeams[index].key}.png',
+                  height: 30,
+                  width: 30,
+                ),
+                Text(
+                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+              ]
+            );
+          },
+        );
+      },
+    );
+  },
+),
+          ),
+              ],
+          ),
+          const SizedBox(height: 20),
+          ExpansionTile(
+          title: Row( children: [
+              Image.asset(
+                'assets/La Liga.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
+                'La Liga',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),],),
+              
+              children: <Widget>[
+              Card(
+            elevation: 5,
+            child: FutureBuilder<QuerySnapshot>(
+  future: listeMatch.where('Compet', isEqualTo: 'La Liga').get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    }
+
+    List<DocumentSnapshot> matches = snapshot.data!.docs;
+    List<DocumentSnapshot> matchesToday = matches.where((doc) {
+      DateTime dateMatch = (doc["Date"] as Timestamp).toDate();
+      return dateMatch.isBefore(DateTime.now());
+    }).toList();
+
+    Map<String, int> teamPoints = {};
+    List<String> clubs = [];
+
+    // Fonction asynchrone pour traiter les matchs
+    Future<void> processMatches() async {
+      for (var match in matchesToday) {
+        int AGoals = 0;
+        int BGoals = 0;
+        QuerySnapshot butsSnapshot = await FirebaseFirestore.instance
+          .collection('match')
+          .doc(match.id)
+          .collection('but')
+          .get();
+
+        butsSnapshot.docs.forEach((butDoc) {
+          AGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'A').length;
+          BGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'B').length;
+        });
+
+        if (AGoals > BGoals) {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 3;
+        } else if (AGoals < BGoals) {
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 3;
+        } else {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 1;
+
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 1;
+        }
+      }
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+        querySnapshot.docs.forEach((doc) {
+          if(doc.id == "La Liga"){
+            for(int i = 1;i<=20;i++){
+                clubs.add(doc["Equipe $i"]);
+            }
+          }
+        });
+      } catch (e) {
+        print('Error fetching clubs: $e');
+      }
+    }
+
+    // Appeler la fonction asynchrone et attendre sa fin
+    return FutureBuilder<void>(
+      future: processMatches(),
+      builder: (BuildContext context, AsyncSnapshot<void> _) {
+        // Trier les équipes par points
+        List<MapEntry<String, int>> sortedTeams = teamPoints.entries.toList();
+        for(String club in clubs){
+          bool clubExists = sortedTeams.any((entry) => entry.key == club);
+          if(!clubExists){
+            sortedTeams.add(MapEntry(club, 0));
+          }
+        }
+        sortedTeams.sort((a, b) => b.value.compareTo(a.value));
+
+        // Retourner le widget ListView une fois que le traitement est terminé
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedTeams.length,
+          itemBuilder: (context, index) {
+            return Row(
+              children:[
+                Text(
+                  '${index+1} ) ',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+                Image.asset(
+                  'assets/${sortedTeams[index].key}.png',
+                  height: 30,
+                  width: 30,
+                ),
+                Text(
+                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+              ]
+            );
+          },
+        );
+      },
+    );
+  },
+),
+          ),
+              ],
+          ),
+          const SizedBox(height: 20),
+          ExpansionTile(
+          title: Row( children: [
+              Image.asset(
+                'assets/Serie A.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
+                'Serie A',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),],),
+              
+              children: <Widget>[
+              Card(
+            elevation: 5,
+            child: FutureBuilder<QuerySnapshot>(
+  future: listeMatch.where('Compet', isEqualTo: 'Serie A').get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    }
+
+    List<DocumentSnapshot> matches = snapshot.data!.docs;
+    List<DocumentSnapshot> matchesToday = matches.where((doc) {
+      DateTime dateMatch = (doc["Date"] as Timestamp).toDate();
+      return dateMatch.isBefore(DateTime.now());
+    }).toList();
+
+    Map<String, int> teamPoints = {};
+    List<String> clubs = [];
+
+    // Fonction asynchrone pour traiter les matchs
+    Future<void> processMatches() async {
+      for (var match in matchesToday) {
+        int AGoals = 0;
+        int BGoals = 0;
+        QuerySnapshot butsSnapshot = await FirebaseFirestore.instance
+          .collection('match')
+          .doc(match.id)
+          .collection('but')
+          .get();
+
+        butsSnapshot.docs.forEach((butDoc) {
+          AGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'A').length;
+          BGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'B').length;
+        });
+
+        if (AGoals > BGoals) {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 3;
+        } else if (AGoals < BGoals) {
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 3;
+        } else {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 1;
+
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 1;
+        }
+      }
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+        querySnapshot.docs.forEach((doc) {
+          if(doc.id == "Serie A"){
+            for(int i = 1;i<=20;i++){
+                clubs.add(doc["Equipe $i"]);
+            }
+          }
+        });
+      } catch (e) {
+        print('Error fetching clubs: $e');
+      }
+    }
+
+    // Appeler la fonction asynchrone et attendre sa fin
+    return FutureBuilder<void>(
+      future: processMatches(),
+      builder: (BuildContext context, AsyncSnapshot<void> _) {
+        // Trier les équipes par points
+        List<MapEntry<String, int>> sortedTeams = teamPoints.entries.toList();
+        for(String club in clubs){
+          bool clubExists = sortedTeams.any((entry) => entry.key == club);
+          if(!clubExists){
+            sortedTeams.add(MapEntry(club, 0));
+          }
+        }
+        sortedTeams.sort((a, b) => b.value.compareTo(a.value));
+
+        // Retourner le widget ListView une fois que le traitement est terminé
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedTeams.length,
+          itemBuilder: (context, index) {
+            return Row(
+              children:[
+                Text(
+                  '${index+1} ) ',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+                Image.asset(
+                  'assets/${sortedTeams[index].key}.png',
+                  height: 30,
+                  width: 30,
+                ),
+                Text(
+                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+              ]
+            );
+          },
+        );
+      },
+    );
+  },
+),
+          ),
+              ],
+          ),
+          const SizedBox(height: 20),
+          ExpansionTile(
+          title: Row( children: [
+              Image.asset(
+                'assets/Bundesliga.png',
+                width: 50,
+                height:50,
+              ),
+              const Text(
+                'Bundesliga',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),],),
+              
+              children: <Widget>[
+              Card(
+            elevation: 5,
+            child: FutureBuilder<QuerySnapshot>(
+  future: listeMatch.where('Compet', isEqualTo: 'Bundesliga').get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    }
+
+    List<DocumentSnapshot> matches = snapshot.data!.docs;
+    List<DocumentSnapshot> matchesToday = matches.where((doc) {
+      DateTime dateMatch = (doc["Date"] as Timestamp).toDate();
+      return dateMatch.isBefore(DateTime.now());
+    }).toList();
+
+    Map<String, int> teamPoints = {};
+    List<String> clubs = [];
+
+    // Fonction asynchrone pour traiter les matchs
+    Future<void> processMatches() async {
+      for (var match in matchesToday) {
+        int AGoals = 0;
+        int BGoals = 0;
+        QuerySnapshot butsSnapshot = await FirebaseFirestore.instance
+          .collection('match')
+          .doc(match.id)
+          .collection('but')
+          .get();
+
+        butsSnapshot.docs.forEach((butDoc) {
+          AGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'A').length;
+          BGoals = butsSnapshot.docs.where((doc) => doc['Equipe'] == 'B').length;
+        });
+
+        if (AGoals > BGoals) {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 3;
+        } else if (AGoals < BGoals) {
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 3;
+        } else {
+          teamPoints[match['Equipe A']] ??= 0;
+          teamPoints[match['Equipe A']] = (teamPoints[match['Equipe A']] ?? 0) + 1;
+
+          teamPoints[match['Equipe B']] ??= 0;
+          teamPoints[match['Equipe B']] = (teamPoints[match['Equipe B']] ?? 0) + 1;
+        }
+      }
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Championnat').get();
+        querySnapshot.docs.forEach((doc) {
+          if(doc.id == "Bundesliga"){
+            for(int i = 1;i<=18;i++){
+                clubs.add(doc["Equipe $i"]);
+            }
+          }
+        });
+      } catch (e) {
+        print('Error fetching clubs: $e');
+      }
+    }
+
+    // Appeler la fonction asynchrone et attendre sa fin
+    return FutureBuilder<void>(
+      future: processMatches(),
+      builder: (BuildContext context, AsyncSnapshot<void> _) {
+        // Trier les équipes par points
+        List<MapEntry<String, int>> sortedTeams = teamPoints.entries.toList();
+        for(String club in clubs){
+          bool clubExists = sortedTeams.any((entry) => entry.key == club);
+          if(!clubExists){
+            sortedTeams.add(MapEntry(club, 0));
+          }
+        }
+        sortedTeams.sort((a, b) => b.value.compareTo(a.value));
+
+        // Retourner le widget ListView une fois que le traitement est terminé
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedTeams.length,
+          itemBuilder: (context, index) {
+            return Row(
+              children:[
+                Text(
+                  '${index+1} ) ',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+                Image.asset(
+                  'assets/${sortedTeams[index].key}.png',
+                  height: 30,
+                  width: 30,
+                ),
+                Text(
+                  ' ${sortedTeams[index].key} : ${sortedTeams[index].value} points',
+                  style: const TextStyle(fontWeight: FontWeight.bold,)
+                ),
+              ]
+            );
+          },
+        );
+      },
+    );
+  },
+),
+          ),
+              ],
+          ),
+          const SizedBox(height: 10),
+            ]
+        ),
+      ),
+    )
     );
   }
 }
@@ -2593,7 +3512,8 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const Home(),
     const Matches(),
-    Profile(),
+    const Profile(),
+    const Classement(),
     const Settings(),
   ];
 
@@ -2670,6 +3590,10 @@ class _MainPageState extends State<MainPage> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
                 label: 'Profil',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.emoji_events),
+                label: 'Classement',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
