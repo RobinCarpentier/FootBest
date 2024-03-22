@@ -2099,9 +2099,10 @@ class Matches extends StatelessWidget {
                       Object goalsTeamB = 0;
                       Object listA = [];
                       Object listB = [];
+                      String pseudoUser = "";
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB(),RecupPseudoUtilisateur()]),
                         builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
@@ -2111,9 +2112,10 @@ class Matches extends StatelessWidget {
                           goalsTeamB = goalsSnapshot.data![1];
                           listA = goalsSnapshot.data![2];
                           listB = goalsSnapshot.data![3];
+                          pseudoUser = goalsSnapshot.data![4].toString();
 
                         return InkWell(
-                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                           child: Column(
                           children: [
                             Column(
@@ -2260,9 +2262,10 @@ class Matches extends StatelessWidget {
                       Object goalsTeamB = 0;
                       Object listA = [];
                       Object listB = [];
+                      String pseudoUser = "";
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB(),RecupPseudoUtilisateur()]),
                         builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
@@ -2272,9 +2275,10 @@ class Matches extends StatelessWidget {
                           goalsTeamB = goalsSnapshot.data![1];
                           listA = goalsSnapshot.data![2];
                           listB = goalsSnapshot.data![3];
+                          pseudoUser = goalsSnapshot.data![4].toString();
 
                         return InkWell(
-                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                           child: Column(
                           children: [
                             Column(
@@ -2420,9 +2424,10 @@ class Matches extends StatelessWidget {
                       Object goalsTeamB = 0;
                       Object listA = [];
                       Object listB = [];
+                      String pseudoUser = "";
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB(),RecupPseudoUtilisateur()]),
                         builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
@@ -2432,9 +2437,10 @@ class Matches extends StatelessWidget {
                           goalsTeamB = goalsSnapshot.data![1];
                           listA = goalsSnapshot.data![2];
                           listB = goalsSnapshot.data![3];
+                          pseudoUser = goalsSnapshot.data![4].toString();
 
                         return InkWell(
-                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                           child: Column(
                           children: [
                             Column(
@@ -2580,9 +2586,10 @@ class Matches extends StatelessWidget {
                       Object goalsTeamB = 0;
                       Object listA = [];
                       Object listB = [];
+                      String pseudoUser = "";
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB(),RecupPseudoUtilisateur()]),
                         builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
@@ -2592,9 +2599,10 @@ class Matches extends StatelessWidget {
                           goalsTeamB = goalsSnapshot.data![1];
                           listA = goalsSnapshot.data![2];
                           listB = goalsSnapshot.data![3];
+                          pseudoUser = goalsSnapshot.data![4].toString();
 
                         return InkWell(
-                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                           child: Column(
                           children: [
                             Column(
@@ -2740,9 +2748,10 @@ class Matches extends StatelessWidget {
                       Object goalsTeamB = 0;
                       Object listA = [];
                       Object listB = [];
+                      String pseudoUser = "";
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB(),RecupPseudoUtilisateur()]),
                         builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
@@ -2752,9 +2761,10 @@ class Matches extends StatelessWidget {
                           goalsTeamB = goalsSnapshot.data![1];
                           listA = goalsSnapshot.data![2];
                           listB = goalsSnapshot.data![3];
+                          pseudoUser = goalsSnapshot.data![4].toString();
 
                         return InkWell(
-                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                           child: Column(
                           children: [
                             Column(
@@ -2829,12 +2839,111 @@ class Matches extends StatelessWidget {
     )
     );
   }
-  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB) {
+  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB, String matchId, String pseudoUser) {
     List<dynamic> convertedListA = listA is List ? listA : [listA];
     List<dynamic> convertedListB = listB is List ? listB : [listB];
+    TextEditingController _textEditingController = TextEditingController();
+    Future<String?> fetchPhotoUrl(String pseudo) async {
+      try {
+        // Effectuer une requête de lecture dans la collection 'utilisateurs' avec le filtre sur le champ 'pseudo'
+        var querySnapshot = await FirebaseFirestore.instance
+            .collection('utilisateurs')
+            .where('pseudo', isEqualTo: pseudo)
+            .get();
+
+        // Si un document correspondant est trouvé, récupérer le champ 'photoUrl'
+        if (querySnapshot.docs.isNotEmpty) {
+          var userDocument = querySnapshot.docs.first;
+          var photoUrl = userDocument['photoUrl'];
+          return photoUrl;
+        } else {
+          // Aucun utilisateur trouvé avec ce pseudo
+          return null;
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print("Erreur lors de la récupération de l'URL de la photo : $e");
+        return null;
+      }
+    }
+    // Fonction pour récupérer les amis de l'utilisateur actuel
+  Future<List<String>> fetchFriends(String pseudo) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .where('pseudo', isEqualTo: pseudo)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var userDocument = querySnapshot.docs.first;
+        var amis = userDocument['amis'] ?? [];
+        return List<String>.from(amis);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des amis : $e");
+      return [];
+    }
+  }
+    Future<void> addComment(String matchId, String pseudo, String commentaire) async {
+      try {
+        // Récupérer une référence au document de l'article dans Firestore
+        DocumentReference<Map<String, dynamic>> articleRef = FirebaseFirestore.instance.collection('match').doc(matchId);
+
+        // Récupérer les données actuelles de l'article
+        DocumentSnapshot<Map<String, dynamic>> articleSnapshot = await articleRef.get();
+
+        // Vérifier si le document existe
+        if (articleSnapshot.exists) {
+          // Récupérer les commentaires actuels (s'il y en a)
+          List<dynamic> comments = articleSnapshot.data()?['Com'] ?? [];
+
+          // Ajouter le nouveau commentaire avec le pseudo de l'utilisateur
+          comments.add({
+            'pseudo': pseudo,
+            'com': commentaire,
+          });
+
+          // Mettre à jour le champ 'Com' dans le document de l'article avec les nouveaux commentaires
+          await articleRef.update({
+            'Com': comments,
+          });
+        } else {
+          // Gérer le cas où le document de l'article n'existe pas
+          throw 'Document du match inexistant';
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print('Erreur lors de l\'ajout du commentaire : $e');
+        // Vous pouvez choisir de renvoyer une erreur ou de gérer différemment cette situation
+        throw e;
+      }
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        return FutureBuilder<List<String>>(
+        future: fetchFriends(pseudoUser),
+        builder: (context, friendsSnapshot) {
+          if (friendsSnapshot.connectionState == ConnectionState.waiting) {
+            // Gérer l'état de chargement
+            return AlertDialog(
+              content: CircularProgressIndicator(),
+            );
+          } else if (friendsSnapshot.hasError) {
+            // Gérer les erreurs
+            return AlertDialog(
+              content: Text('Erreur: ${friendsSnapshot.error}'),
+            );
+          } else {
+            // Filtrer les commentaires pour les amis seulement
+            List<String> friends = friendsSnapshot.data ?? [];
+            friends.add(pseudoUser);
+            List<dynamic> filteredComments = [];
+            if(data['Com'].isNotEmpty){
+              filteredComments = data['Com'].where((comment) => friends.contains(comment['pseudo'])).toList();
+            }
         return AlertDialog(
           content: ConstrainedBox(
   constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5,), // Définir une hauteur maximale (80% de la hauteur de l'écran)
@@ -2936,10 +3045,110 @@ class Matches extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 20),
+          ]
+        ),
+            //Section Commentaire
+                const SizedBox(height: 20),
+                const SizedBox(
+                width: 250,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Commentaires",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                ),
+                SizedBox(
+                width: 250,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: filteredComments.map<Widget>((comment) {
+                    return FutureBuilder<String?>(
+                      future: fetchPhotoUrl(comment["pseudo"]),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Gérer l'état de chargement
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Gérer les erreurs
+                          return Text('Erreur: ${snapshot.error}');
+                        } else {
+                          // Utiliser l'URL de l'image avec NetworkImage
+                          String? imageUrl = snapshot.data;
+                          String url;
+                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                            url = imageUrl;
+                          } else {
+                            url = "/assets/Inconnu.png";
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(url),
+                                  radius: 10,
+                                ),
+                                Text(
+                                  " ${comment["pseudo"]} : ", // Pseudo
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "${comment["com"]}", // Commentaire
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }
+                    );
+                  }).toList(),
+                ),),
+                SizedBox(
+                width: 250, // Définir une largeur maximale pour le Container
+                child: Row(
+                  children: [
+                    Expanded(
+                    child: TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        hintText: 'Commenter...',
+                      ),
+                    ),),
+                    const SizedBox(width: 10), // Espace entre le champ de texte et le bouton
+                    ElevatedButton(
+                      onPressed: () {
+                        String comment = _textEditingController.text;
+                        _textEditingController.clear();
+                        addComment(matchId, pseudoUser, comment)
+                        .then((_) {
+                          // Gérer la réussite de l'ajout du commentaire
+                          print('Commentaire ajouté avec succès !');
+                        })
+                        .catchError((error) {
+                          // Gérer les erreurs lors de l'ajout du commentaire
+                          print('Erreur lors de l\'ajout du commentaire : $error');
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Envoyer'),
+                    ),
+                  ],
+                ))
           ],
         ),
-      ],
-    ),
           ),),
           actions: <Widget>[
             TextButton(
@@ -2950,8 +3159,10 @@ class Matches extends StatelessWidget {
             ),
           ],
         );
+        }
       },
     );
+  });
   }
 }
 
@@ -3025,7 +3236,7 @@ class Home extends StatelessWidget {
                         allDocuments.sort((a, b) => (b['Date'] as Timestamp).compareTo(a['Date'] as Timestamp));
 
                         return FutureBuilder(
-                          future: Future.wait([getUserFollowClub(), getUserFollowLeague()]),
+                          future: Future.wait([getUserFollowClub(), getUserFollowLeague(), RecupPseudoUtilisateur()]),
                           builder: (BuildContext context, AsyncSnapshot<List<dynamic>> userSnapshot) {
                             if (userSnapshot.connectionState == ConnectionState.waiting) {
                               return const CircularProgressIndicator();
@@ -3033,6 +3244,8 @@ class Home extends StatelessWidget {
 
                             List<String> followClubs = userSnapshot.data![0];
                             List<String> followLeagues = userSnapshot.data![1];
+                            String pseudoUser = userSnapshot.data![2];
+
                             List<QueryDocumentSnapshot> filtered = allDocuments.where((match) {
                               DateTime matchDate = (match['Date'] as Timestamp).toDate();
                               return matchDate.isBefore(DateTime.now());
@@ -3078,7 +3291,7 @@ class Home extends StatelessWidget {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                                   child: InkWell(
-                                    onTap: (){_showArticleContent(context,data,paragraphes);},
+                                    onTap: (){_showArticleContent(context,data,paragraphes,document.id,pseudoUser);},
                                     child: Card(
                                   color: Colors.white,
                                   elevation: 5,
@@ -3166,7 +3379,7 @@ class Home extends StatelessWidget {
                         return Padding(
                             padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                             child: InkWell( 
-                              onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                              onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                               child: Card(
                             color: Colors.white,
                             elevation: 5,
@@ -3281,7 +3494,7 @@ class Home extends StatelessWidget {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                                 child: InkWell(
-                                  onTap: (){_showArticleContent(context,data,paragraphes);},
+                                  onTap: (){_showArticleContent(context,data,paragraphes,document.id,pseudoUser);},
                                   child: Card(
                                 color: Colors.white,
                                 elevation: 5,
@@ -3368,7 +3581,7 @@ class Home extends StatelessWidget {
                       return Padding(
                           padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                           child: InkWell(
-                            onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                            onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB, document.id, pseudoUser);},
                             child: Card(
                           color: Colors.white,
                           elevation: 5,
@@ -3465,10 +3678,107 @@ class Home extends StatelessWidget {
       )
     );
   }
-  void _showArticleContent(BuildContext context, Map<String, dynamic> data, List<String> paragraphes) {
+  void _showArticleContent(BuildContext context, Map<String, dynamic> data, List<String> paragraphes, String articleId, String pseudoUser) {
+    TextEditingController _textEditingController = TextEditingController();
+    Future<String?> fetchPhotoUrl(String pseudo) async {
+      try {
+        // Effectuer une requête de lecture dans la collection 'utilisateurs' avec le filtre sur le champ 'pseudo'
+        var querySnapshot = await FirebaseFirestore.instance
+            .collection('utilisateurs')
+            .where('pseudo', isEqualTo: pseudo)
+            .get();
+
+        // Si un document correspondant est trouvé, récupérer le champ 'photoUrl'
+        if (querySnapshot.docs.isNotEmpty) {
+          var userDocument = querySnapshot.docs.first;
+          var photoUrl = userDocument['photoUrl'];
+          return photoUrl;
+        } else {
+          // Aucun utilisateur trouvé avec ce pseudo
+          return null;
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print("Erreur lors de la récupération de l'URL de la photo : $e");
+        return null;
+      }
+    }
+    // Fonction pour récupérer les amis de l'utilisateur actuel
+  Future<List<String>> fetchFriends(String pseudo) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .where('pseudo', isEqualTo: pseudo)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var userDocument = querySnapshot.docs.first;
+        var amis = userDocument['amis'] ?? [];
+        return List<String>.from(amis);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des amis : $e");
+      return [];
+    }
+  }
+    Future<void> addComment(String articleId, String pseudo, String commentaire) async {
+      try {
+        // Récupérer une référence au document de l'article dans Firestore
+        DocumentReference<Map<String, dynamic>> articleRef = FirebaseFirestore.instance.collection('article').doc(articleId);
+
+        // Récupérer les données actuelles de l'article
+        DocumentSnapshot<Map<String, dynamic>> articleSnapshot = await articleRef.get();
+
+        // Vérifier si le document existe
+        if (articleSnapshot.exists) {
+          // Récupérer les commentaires actuels (s'il y en a)
+          List<dynamic> comments = articleSnapshot.data()?['Com'] ?? [];
+
+          // Ajouter le nouveau commentaire avec le pseudo de l'utilisateur
+          comments.add({
+            'pseudo': pseudo,
+            'com': commentaire,
+          });
+
+          // Mettre à jour le champ 'Com' dans le document de l'article avec les nouveaux commentaires
+          await articleRef.update({
+            'Com': comments,
+          });
+        } else {
+          // Gérer le cas où le document de l'article n'existe pas
+          throw 'Document de l\'article inexistant';
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print('Erreur lors de l\'ajout du commentaire : $e');
+        // Vous pouvez choisir de renvoyer une erreur ou de gérer différemment cette situation
+        throw e;
+      }
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        return FutureBuilder<List<String>>(
+        future: fetchFriends(pseudoUser),
+        builder: (context, friendsSnapshot) {
+          if (friendsSnapshot.connectionState == ConnectionState.waiting) {
+            // Gérer l'état de chargement
+            return AlertDialog(
+              content: CircularProgressIndicator(),
+            );
+          } else if (friendsSnapshot.hasError) {
+            // Gérer les erreurs
+            return AlertDialog(
+              content: Text('Erreur: ${friendsSnapshot.error}'),
+            );
+          } else {
+            // Filtrer les commentaires pour les amis seulement
+            List<String> friends = friendsSnapshot.data ?? [];
+            friends.add(pseudoUser);
+            List<dynamic> filteredComments = data['Com'].where((comment) => friends.contains(comment['pseudo'])).toList();
+
         return AlertDialog(
           content: SingleChildScrollView(
             child: Column(
@@ -3498,6 +3808,94 @@ class Home extends StatelessWidget {
                     }
                   }).toList(),
                 ),
+                //Section Commentaire
+                SizedBox(height: 20),
+                const Text(
+                  "Commentaires",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: filteredComments.map<Widget>((comment) {
+                    return FutureBuilder<String?>(
+                      future: fetchPhotoUrl(comment["pseudo"]),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Gérer l'état de chargement
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Gérer les erreurs
+                          return Text('Erreur: ${snapshot.error}');
+                        } else {
+                          // Utiliser l'URL de l'image avec NetworkImage
+                          String? imageUrl = snapshot.data;
+                          String url;
+                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                            url = imageUrl;
+                          } else {
+                            url = "/assets/Inconnu.png";
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(url),
+                                  radius: 10,
+                                ),
+                                Text(
+                                  " ${comment["pseudo"]} : ", // Pseudo
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "${comment["com"]}", // Commentaire
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }
+                    );
+                  }).toList(),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          hintText: 'Commenter...',
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10), // Espace entre le champ de texte et le bouton
+                    ElevatedButton(
+                      onPressed: () {
+                        String comment = _textEditingController.text;
+                        _textEditingController.clear();
+                        addComment(articleId, pseudoUser, comment)
+                        .then((_) {
+                          // Gérer la réussite de l'ajout du commentaire
+                          print('Commentaire ajouté avec succès !');
+                        })
+                        .catchError((error) {
+                          // Gérer les erreurs lors de l'ajout du commentaire
+                          print('Erreur lors de l\'ajout du commentaire : $error');
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Envoyer'),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -3509,16 +3907,115 @@ class Home extends StatelessWidget {
               child: Text('Fermer'),
             ),
           ],
-        );
+        );}});
       },
     );
   }
-  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB) {
+  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB, String matchId, String pseudoUser) {
     List<dynamic> convertedListA = listA is List ? listA : [listA];
     List<dynamic> convertedListB = listB is List ? listB : [listB];
+    TextEditingController _textEditingController = TextEditingController();
+    Future<String?> fetchPhotoUrl(String pseudo) async {
+      try {
+        // Effectuer une requête de lecture dans la collection 'utilisateurs' avec le filtre sur le champ 'pseudo'
+        var querySnapshot = await FirebaseFirestore.instance
+            .collection('utilisateurs')
+            .where('pseudo', isEqualTo: pseudo)
+            .get();
+
+        // Si un document correspondant est trouvé, récupérer le champ 'photoUrl'
+        if (querySnapshot.docs.isNotEmpty) {
+          var userDocument = querySnapshot.docs.first;
+          var photoUrl = userDocument['photoUrl'];
+          return photoUrl;
+        } else {
+          // Aucun utilisateur trouvé avec ce pseudo
+          return null;
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print("Erreur lors de la récupération de l'URL de la photo : $e");
+        return null;
+      }
+    }
+    // Fonction pour récupérer les amis de l'utilisateur actuel
+  Future<List<String>> fetchFriends(String pseudo) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('utilisateurs')
+          .where('pseudo', isEqualTo: pseudo)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var userDocument = querySnapshot.docs.first;
+        var amis = userDocument['amis'] ?? [];
+        return List<String>.from(amis);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des amis : $e");
+      return [];
+    }
+  }
+    Future<void> addComment(String matchId, String pseudo, String commentaire) async {
+      try {
+        // Récupérer une référence au document de l'article dans Firestore
+        DocumentReference<Map<String, dynamic>> articleRef = FirebaseFirestore.instance.collection('match').doc(matchId);
+
+        // Récupérer les données actuelles de l'article
+        DocumentSnapshot<Map<String, dynamic>> articleSnapshot = await articleRef.get();
+
+        // Vérifier si le document existe
+        if (articleSnapshot.exists) {
+          // Récupérer les commentaires actuels (s'il y en a)
+          List<dynamic> comments = articleSnapshot.data()?['Com'] ?? [];
+
+          // Ajouter le nouveau commentaire avec le pseudo de l'utilisateur
+          comments.add({
+            'pseudo': pseudo,
+            'com': commentaire,
+          });
+
+          // Mettre à jour le champ 'Com' dans le document de l'article avec les nouveaux commentaires
+          await articleRef.update({
+            'Com': comments,
+          });
+        } else {
+          // Gérer le cas où le document de l'article n'existe pas
+          throw 'Document du match inexistant';
+        }
+      } catch (e) {
+        // Gérer les erreurs éventuelles
+        print('Erreur lors de l\'ajout du commentaire : $e');
+        // Vous pouvez choisir de renvoyer une erreur ou de gérer différemment cette situation
+        throw e;
+      }
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        return FutureBuilder<List<String>>(
+        future: fetchFriends(pseudoUser),
+        builder: (context, friendsSnapshot) {
+          if (friendsSnapshot.connectionState == ConnectionState.waiting) {
+            // Gérer l'état de chargement
+            return AlertDialog(
+              content: CircularProgressIndicator(),
+            );
+          } else if (friendsSnapshot.hasError) {
+            // Gérer les erreurs
+            return AlertDialog(
+              content: Text('Erreur: ${friendsSnapshot.error}'),
+            );
+          } else {
+            // Filtrer les commentaires pour les amis seulement
+            List<String> friends = friendsSnapshot.data ?? [];
+            friends.add(pseudoUser);
+            List<dynamic> filteredComments = [];
+            if(data['Com'].isNotEmpty){
+              filteredComments = data['Com'].where((comment) => friends.contains(comment['pseudo'])).toList();
+            }
         return AlertDialog(
           content: ConstrainedBox(
   constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5,), // Définir une hauteur maximale (80% de la hauteur de l'écran)
@@ -3620,10 +4117,110 @@ class Home extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 20),
+          ]
+        ),
+            //Section Commentaire
+                const SizedBox(height: 20),
+                const SizedBox(
+                width: 250,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Commentaires",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                ),
+                SizedBox(
+                width: 250,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: filteredComments.map<Widget>((comment) {
+                    return FutureBuilder<String?>(
+                      future: fetchPhotoUrl(comment["pseudo"]),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Gérer l'état de chargement
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Gérer les erreurs
+                          return Text('Erreur: ${snapshot.error}');
+                        } else {
+                          // Utiliser l'URL de l'image avec NetworkImage
+                          String? imageUrl = snapshot.data;
+                          String url;
+                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                            url = imageUrl;
+                          } else {
+                            url = "/assets/Inconnu.png";
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(url),
+                                  radius: 10,
+                                ),
+                                Text(
+                                  " ${comment["pseudo"]} : ", // Pseudo
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "${comment["com"]}", // Commentaire
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }
+                    );
+                  }).toList(),
+                ),),
+                SizedBox(
+                width: 250, // Définir une largeur maximale pour le Container
+                child: Row(
+                  children: [
+                    Expanded(
+                    child: TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        hintText: 'Commenter...',
+                      ),
+                    ),),
+                    const SizedBox(width: 10), // Espace entre le champ de texte et le bouton
+                    ElevatedButton(
+                      onPressed: () {
+                        String comment = _textEditingController.text;
+                        _textEditingController.clear();
+                        addComment(matchId, pseudoUser, comment)
+                        .then((_) {
+                          // Gérer la réussite de l'ajout du commentaire
+                          print('Commentaire ajouté avec succès !');
+                        })
+                        .catchError((error) {
+                          // Gérer les erreurs lors de l'ajout du commentaire
+                          print('Erreur lors de l\'ajout du commentaire : $error');
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Envoyer'),
+                    ),
+                  ],
+                ))
           ],
         ),
-      ],
-    ),
           ),),
           actions: <Widget>[
             TextButton(
@@ -3634,8 +4231,10 @@ class Home extends StatelessWidget {
             ),
           ],
         );
+        }
       },
     );
+  });
   }
 }
 
