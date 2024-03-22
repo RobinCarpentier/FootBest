@@ -275,17 +275,54 @@ class _ModifierPseudoFormState extends State<ModifierPseudoForm> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await FirebaseFirestore.instance
+        String newPseudo = _pseudoController.text;
+        final pseudoSnapshot = await FirebaseFirestore.instance
             .collection('utilisateurs')
-            .doc(user.uid)
-            .update({'pseudo': _pseudoController.text});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pseudo modifié avec succès'),
-          ),
-        );
-        Navigator.pop(
-            context); // Retour à l'écran précédent après la modification
+            .where('pseudo', isEqualTo: newPseudo)
+            .get();
+
+        if (pseudoSnapshot.docs.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Pseudo déjà pris'),
+            ),
+          );
+        }
+        
+        else{
+          // Mise à jour du pseudo dans le document de l'utilisateur actuel
+          await FirebaseFirestore.instance
+              .collection('utilisateurs')
+              .doc(user.uid)
+              .update({'pseudo': newPseudo});
+          
+          // Récupération de tous les utilisateurs
+          QuerySnapshot usersSnapshot = await FirebaseFirestore.instance.collection('utilisateurs').get();
+
+          // Parcours de chaque utilisateur pour mettre à jour la liste d'amis
+          for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
+            List<dynamic> friends = userDoc.get('amis');
+            
+            // Vérification si l'utilisateur a des amis et si le pseudo à modifier est présent dans la liste
+            if (friends.contains(_pseudo)) {
+              int index = friends.indexOf(_pseudo);
+              friends[index] = newPseudo;
+              
+              // Mise à jour de la liste d'amis dans le document de l'utilisateur
+              await FirebaseFirestore.instance
+                  .collection('utilisateurs')
+                  .doc(userDoc.id)
+                  .update({'amis': friends});
+            }
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Pseudo modifié avec succès'),
+            ),
+          );
+          Navigator.pop(context); // Retour à l'écran précédent après la modification
+        }
       }
     } catch (e) {
       setState(() {
@@ -2001,9 +2038,7 @@ class Matches extends StatelessWidget {
               ),],),
 
               children: <Widget>[
-              InkWell(
-                onTap: (){},
-                child: Card(
+              Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2044,18 +2079,42 @@ class Matches extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           }
 
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
+                          goalsTeamA = goalsSnapshot.data![0];
+                          goalsTeamB = goalsSnapshot.data![1];
+                          listA = goalsSnapshot.data![2];
+                          listB = goalsSnapshot.data![3];
 
-                        return Column(
+                        return InkWell(
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          child: Column(
                           children: [
                             Column(
                               children: [
@@ -2112,8 +2171,7 @@ class Matches extends StatelessWidget {
                               ), // Espacement à la fin
                           const Divider(), // Ajoute une ligne de séparation entre chaque match
                         ],
-                      ),
-                          ],
+                      ),]),
                         );
                     });
                     }).toList(),
@@ -2122,7 +2180,6 @@ class Matches extends StatelessWidget {
               ),
               ),
             ),
-          ),
               ],
               ),
           const SizedBox(height: 20),
@@ -2142,9 +2199,7 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              InkWell(
-                onTap: (){},
-                child: Card(
+              Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2185,18 +2240,42 @@ class Matches extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           }
 
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
+                          goalsTeamA = goalsSnapshot.data![0];
+                          goalsTeamB = goalsSnapshot.data![1];
+                          listA = goalsSnapshot.data![2];
+                          listB = goalsSnapshot.data![3];
 
-                        return Column(
+                        return InkWell(
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          child: Column(
                           children: [
                             Column(
                               children: [
@@ -2253,7 +2332,7 @@ class Matches extends StatelessWidget {
                         ],
                       )
                           ]
-                        );
+                        ));
                     });
                     }).toList(),
                   );
@@ -2261,7 +2340,6 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
-              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -2281,9 +2359,7 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              InkWell(
-                onTap: (){},
-                child: Card(
+              Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2324,18 +2400,42 @@ class Matches extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           }
 
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
+                          goalsTeamA = goalsSnapshot.data![0];
+                          goalsTeamB = goalsSnapshot.data![1];
+                          listA = goalsSnapshot.data![2];
+                          listB = goalsSnapshot.data![3];
 
-                        return Column(
+                        return InkWell(
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          child: Column(
                           children: [
                             Column(
                               children: [
@@ -2392,7 +2492,7 @@ class Matches extends StatelessWidget {
                         ],
                       )
                           ]
-                        );
+                        ));
                     });
                     }).toList(),
                   );
@@ -2400,7 +2500,6 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
-              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -2420,9 +2519,7 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              InkWell(
-                onTap: (){},
-                child: Card(
+              Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2463,18 +2560,42 @@ class Matches extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           }
 
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
+                          goalsTeamA = goalsSnapshot.data![0];
+                          goalsTeamB = goalsSnapshot.data![1];
+                          listA = goalsSnapshot.data![2];
+                          listB = goalsSnapshot.data![3];
 
-                        return Column(
+                        return InkWell(
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          child: Column(
                           children: [
                             Column(
                               children: [
@@ -2531,7 +2652,7 @@ class Matches extends StatelessWidget {
                         ],
                       )
                           ]
-                        );
+                        ));
                     });
                     }).toList(),
                   );
@@ -2539,7 +2660,6 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
-              ),
               ],
           ),
           const SizedBox(height: 20),
@@ -2559,9 +2679,7 @@ class Matches extends StatelessWidget {
               ),],),
               
               children: <Widget>[
-              InkWell(
-                onTap: (){},
-                child: Card(
+              Card(
             elevation: 5,
             child: Container(
               child: StreamBuilder<QuerySnapshot>(
@@ -2602,18 +2720,42 @@ class Matches extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
 
                       return FutureBuilder(
-                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-                        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+                        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(),listGoalsTeamA(),listGoalsTeamB()]),
+                        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
                           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           }
 
-                          int goalsTeamA = goalsSnapshot.data![0];
-                          int goalsTeamB = goalsSnapshot.data![1];
+                          goalsTeamA = goalsSnapshot.data![0];
+                          goalsTeamB = goalsSnapshot.data![1];
+                          listA = goalsSnapshot.data![2];
+                          listB = goalsSnapshot.data![3];
 
-                        return Column(
+                        return InkWell(
+                          onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
+                          child: Column(
                           children: [
                             Column(
                               children: [
@@ -2670,7 +2812,7 @@ class Matches extends StatelessWidget {
                         ],
                       )
                           ]
-                        );
+                        ));
                     });
                     }).toList(),
                   );
@@ -2678,7 +2820,6 @@ class Matches extends StatelessWidget {
               ),
             ),
           ),
-              ),
               ],
           ),
           const SizedBox(height: 10),
@@ -2686,6 +2827,130 @@ class Matches extends StatelessWidget {
         ),
       ),
     )
+    );
+  }
+  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB) {
+    List<dynamic> convertedListA = listA is List ? listA : [listA];
+    List<dynamic> convertedListB = listB is List ? listB : [listB];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: ConstrainedBox(
+  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5,), // Définir une hauteur maximale (80% de la hauteur de l'écran)
+  child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo de l'équipe A
+                Image.asset(
+                  'assets/${data['Equipe A']}.png',
+                  width: 100,
+                  height: 100,
+                ),
+                // Nom de l'équipe A
+                Text(
+                  '${data['Equipe A']}',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+            // Score du match
+            Text(
+              '$goalsTeamA - $goalsTeamB',
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo de l'équipe B
+                Image.asset(
+                  'assets/${data['Equipe B']}.png',
+                  width: 100,
+                  height: 100,
+                ),
+                // Nom de l'équipe B
+                Text(
+                  '${data['Equipe B']}',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(width: 20),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: convertedListA.isEmpty ? [const SizedBox(width: 115)] : (convertedListA..sort((a, b) => a["Minute"].compareTo(b["Minute"]))).map((but) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        "${but["Joueur"]} ${but["Minute"]}'",
+                        style: const TextStyle(color: Color.fromARGB(255, 112, 112, 112)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            const SizedBox(width: 70),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: convertedListB.isEmpty ? [const SizedBox(width: 115)] : (convertedListB..sort((a, b) => a["Minute"].compareTo(b["Minute"]))).map((but) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        "${but["Joueur"]} ${but["Minute"]}'",
+                        style: const TextStyle(color: Color.fromARGB(255, 112, 112, 112)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            const SizedBox(width: 20),
+          ],
+        ),
+      ],
+    ),
+          ),),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -2874,13 +3139,34 @@ class Home extends StatelessWidget {
                               .get();
                           return querySnapshot.docs.length;
                         }
+
+                        Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      // Compter le nombre de buts pour l'équipe B
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                        Object goalsTeamA = 0;
+                        Object goalsTeamB = 0;
+                        Object listA = [];
+                        Object listB = [];
                         if (followClubs.contains(data['Equipe A']) ||
                           followClubs.contains(data['Equipe B']) ||
                           followLeagues.contains(data['Compet'])) {
                         return Padding(
                             padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                             child: InkWell( 
-                              onTap: (){},
+                              onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
                               child: Card(
                             color: Colors.white,
                             elevation: 5,
@@ -2898,14 +3184,16 @@ class Home extends StatelessWidget {
           ),
         ),
         FutureBuilder(
-          future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-          builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
-            if (goalsSnapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
+        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(), listGoalsTeamA(), listGoalsTeamB()]),
+        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
+          if (goalsSnapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
 
-            int goalsTeamA = goalsSnapshot.data![0];
-            int goalsTeamB = goalsSnapshot.data![1];
+          goalsTeamA = goalsSnapshot.data![0];
+          goalsTeamB = goalsSnapshot.data![1];
+          listA = goalsSnapshot.data![2];
+          listB = goalsSnapshot.data![3];
 
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -3054,13 +3342,33 @@ class Home extends StatelessWidget {
                             .get();
                         return querySnapshot.docs.length;
                       }
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamA() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'A')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      
+                      // Compter le nombre de buts pour l'équipe B
+                      Future<List<QueryDocumentSnapshot<Object?>>> listGoalsTeamB() async {
+                        QuerySnapshot querySnapshot = await match.doc(document.id)
+                            .collection('but')
+                            .where('Equipe', isEqualTo: 'B')
+                            .get();
+                        return querySnapshot.docs;
+                      }
+                      Object goalsTeamA = 0;
+                      Object goalsTeamB = 0;
+                      Object listA = [];
+                      Object listB = [];
                       if (followClubs.contains(data['Equipe A']) ||
                         followClubs.contains(data['Equipe B']) ||
                         followLeagues.contains(data['Compet'])) {
                       return Padding(
                           padding: const EdgeInsets.only(bottom: 20), // Ajoute de l'espace entre chaque Card
                           child: InkWell(
-                            onTap: (){},
+                            onTap: (){_showMatchContent(context, data, goalsTeamA, goalsTeamB, listA, listB);},
                             child: Card(
                           color: Colors.white,
                           elevation: 5,
@@ -3078,14 +3386,16 @@ class Home extends StatelessWidget {
         ),
       ),
       FutureBuilder(
-        future: Future.wait([countGoalsTeamA(), countGoalsTeamB()]),
-        builder: (BuildContext context, AsyncSnapshot<List<int>> goalsSnapshot) {
+        future: Future.wait([countGoalsTeamA(), countGoalsTeamB(), listGoalsTeamA(), listGoalsTeamB()]),
+        builder: (BuildContext context, AsyncSnapshot<List<Object>> goalsSnapshot) {
           if (goalsSnapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           }
 
-          int goalsTeamA = goalsSnapshot.data![0];
-          int goalsTeamB = goalsSnapshot.data![1];
+          goalsTeamA = goalsSnapshot.data![0];
+          goalsTeamB = goalsSnapshot.data![1];
+          listA = goalsSnapshot.data![2];
+          listB = goalsSnapshot.data![3];
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -3155,7 +3465,7 @@ class Home extends StatelessWidget {
       )
     );
   }
-   void _showArticleContent(BuildContext context, Map<String, dynamic> data, List<String> paragraphes) {
+  void _showArticleContent(BuildContext context, Map<String, dynamic> data, List<String> paragraphes) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -3165,8 +3475,8 @@ class Home extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data['Titre'], // Assurez-vous que 'data' est accessible ici
-                  style: TextStyle(
+                  data['Titre'],
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -3191,6 +3501,130 @@ class Home extends StatelessWidget {
               ],
             ),
           ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _showMatchContent(BuildContext context, Map<String, dynamic> data, Object goalsTeamA, Object goalsTeamB, Object listA, Object listB) {
+    List<dynamic> convertedListA = listA is List ? listA : [listA];
+    List<dynamic> convertedListB = listB is List ? listB : [listB];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: ConstrainedBox(
+  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5,), // Définir une hauteur maximale (80% de la hauteur de l'écran)
+  child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          '${data['Compet']} - ${data['Date'].toDate().day}/${data['Date'].toDate().month}/${data['Date'].toDate().year} (Journée ${data['Journée']} sur 34)',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo de l'équipe A
+                Image.asset(
+                  'assets/${data['Equipe A']}.png',
+                  width: 100,
+                  height: 100,
+                ),
+                // Nom de l'équipe A
+                Text(
+                  '${data['Equipe A']}',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10), // Espacement entre le nom de l'équipe A et le score
+            // Score du match
+            Text(
+              '$goalsTeamA - $goalsTeamB',
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 10), // Espacement entre le score et le nom de l'équipe B
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo de l'équipe B
+                Image.asset(
+                  'assets/${data['Equipe B']}.png',
+                  width: 100,
+                  height: 100,
+                ),
+                // Nom de l'équipe B
+                Text(
+                  '${data['Equipe B']}',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(width: 20),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: convertedListA.isEmpty ? [const SizedBox(width: 115)] : (convertedListA..sort((a, b) => a["Minute"].compareTo(b["Minute"]))).map((but) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        "${but["Joueur"]} ${but["Minute"]}'",
+                        style: const TextStyle(color: Color.fromARGB(255, 112, 112, 112)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            const SizedBox(width: 70),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: convertedListB.isEmpty ? [const SizedBox(width: 115)] : (convertedListB..sort((a, b) => a["Minute"].compareTo(b["Minute"]))).map((but) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        "${but["Joueur"]} ${but["Minute"]}'",
+                        style: const TextStyle(color: Color.fromARGB(255, 112, 112, 112)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            const SizedBox(width: 20),
+          ],
+        ),
+      ],
+    ),
+          ),),
           actions: <Widget>[
             TextButton(
               onPressed: () {
